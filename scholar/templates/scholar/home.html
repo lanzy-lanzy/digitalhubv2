@@ -1,0 +1,146 @@
+{% extends 'scholar/base.html' %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg p-6 mb-6 shadow-sm">
+        <form method="get" action="{% url 'home' %}" class="mb-6">
+            <div class="flex gap-3">
+                <div class="flex-1 relative">
+                    <input type="text" name="q" value="{{ query }}" 
+                           class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="Search articles, authors...">
+                    <svg class="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <button type="submit" 
+                        class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if query %}
+        <div class="text-sm text-gray-600 mb-4">
+            Showing results for: <span class="font-medium">{{ query }}</span>
+        </div>
+    {% endif %}
+
+    <div class="space-y-8">
+        {% for paper in papers %}
+            <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                <!-- Paper Header -->
+                <div class="p-6 border-b border-gray-100">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 mb-2 leading-tight">
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'paper_detail' paper.id %}" class="hover:text-blue-600 transition-colors">
+                                        {{ paper.title }}
+                                    </a>
+                                {% else %}
+                                    {{ paper.title }}
+                                {% endif %}
+                            </h2>
+                            <div class="flex flex-wrap items-center text-sm text-gray-600 gap-2">
+                                <div class="font-medium">
+                                    {% for author in paper.authors.all %}
+                                        {% if not forloop.first %}, {% endif %}
+                                        {{ author.name }}
+                                    {% endfor %}
+                                </div>
+                                <span class="text-gray-400">•</span>
+                                <span>{{ paper.publication_date|date:"Y" }}</span>
+                                {% if paper.citations > 0 %}
+                                    <span class="text-gray-400">•</span>
+                                    <span>{{ paper.citations }} citations</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            {% if paper.available_copies > 0 %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    {{ paper.available_copies }} available
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    Not available
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paper Preview Content -->
+                <div class="p-6">
+                    <!-- Abstract -->
+                    <div class="mb-4">
+                        <h3 class="text-sm font-semibold text-gray-900 mb-2">Abstract</h3>
+                        <p class="text-gray-700 text-sm leading-relaxed">{{ paper.abstract }}</p>
+                    </div>
+
+                    <!-- Introduction Preview -->
+                    {% if paper.introduction %}
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2">Introduction</h3>
+                            <div class="relative">
+                                <div class="text-gray-700 text-sm leading-relaxed {% if not user.is_authenticated %}line-clamp-3{% endif %}">
+                                    {{ paper.introduction }}
+                                </div>
+                                {% if not user.is_authenticated %}
+                                    <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Paper Footer -->
+                <div class="px-6 py-4 bg-gray-50 rounded-b-lg border-t border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            {% if user.is_authenticated %}
+                                {% if paper.available_copies > 0 %}
+                                    <a href="{% url 'borrow_paper' paper.id %}" 
+                                       class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        <svg class="w-4 h-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+                                        </svg>
+                                        Borrow
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'paper_detail' paper.id %}" 
+                                   class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    View Details
+                                </a>
+                            {% else %}
+                                <a href="{% url 'login' %}" 
+                                   class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <svg class="w-4 h-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Continue Reading
+                                </a>
+                            {% endif %}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            Published {{ paper.publication_date|date:"M d, Y" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="bg-white rounded-lg p-8 text-center shadow-sm">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12a4 4 0 00-4-4h-.01M12 12a4 4 0 01-4 4h-.01"/>
+                </svg>
+                <h3 class="mt-4 text-lg font-medium text-gray-900">No results found</h3>
+                <p class="mt-2 text-gray-500">Try adjusting your search terms or filters</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

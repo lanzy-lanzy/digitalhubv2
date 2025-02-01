@@ -1,0 +1,81 @@
+{% extends "scholar/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Author Analytics: {{ author.name }}</h2>
+
+    <!-- Author Overview -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Name:</strong><br>{{ author.name }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Affiliation:</strong><br>{{ author.affiliation }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Email:</strong><br>{{ author.email|default:"Not provided" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Papers</h5>
+                    <h2>{{ total_papers }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Citations</h5>
+                    <h2>{{ total_citations }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Papers List -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Papers</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Publication Date</th>
+                            <th>Citations</th>
+                            <th>Available Copies</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paper in papers %}
+                        <tr>
+                            <td>{{ paper.title }}</td>
+                            <td>{{ paper.publication_date }}</td>
+                            <td>{{ paper.citations }}</td>
+                            <td>{{ paper.available_copies }}</td>
+                            <td>
+                                <a href="{% url 'paper_analytics' paper.id %}" class="btn btn-sm btn-info">Analytics</a>
+                                <a href="{% url 'admin:scholar_paper_change' paper.id %}" class="btn btn-sm btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

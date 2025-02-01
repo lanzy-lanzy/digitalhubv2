@@ -1,0 +1,269 @@
+{% extends "scholar/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ showContent: false }" x-init="setTimeout(() => showContent = true, 100)">
+    <!-- Header -->
+    <div class="mb-8"
+         x-show="showContent"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform -translate-y-4"
+         x-transition:enter-end="opacity-100 transform translate-y-0">
+        <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg">
+                <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Paper Analytics</h1>
+                <p class="mt-1 text-lg text-gray-500">{{ paper.title }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paper Overview -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8"
+         x-show="showContent"
+         x-transition:enter="transition ease-out duration-300 delay-150"
+         x-transition:enter-start="opacity-0 transform -translate-y-4"
+         x-transition:enter-end="opacity-100 transform translate-y-0">
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Overview</h2>
+        </div>
+        <div class="px-6 py-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-gray-500">Authors</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for author in paper.authors.all %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                {{ author.name }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-gray-500">Publication Date</h3>
+                    <p class="text-lg font-medium text-gray-900">{{ paper.publication_date|date:"M d, Y" }}</p>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-sm font-medium text-gray-500">Available Copies</h3>
+                    <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if paper.available_copies > 0 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ paper.available_copies }} copies
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Borrows -->
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-sm overflow-hidden"
+             x-show="showContent"
+             x-transition:enter="transition ease-out duration-300 delay-300"
+             x-transition:enter-start="opacity-0 transform -translate-y-4"
+             x-transition:enter-end="opacity-100 transform translate-y-0">
+            <div class="px-6 py-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-blue-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-blue-100 truncate">Total Borrows</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-white">{{ total_borrows }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Borrows -->
+        <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-sm overflow-hidden"
+             x-show="showContent"
+             x-transition:enter="transition ease-out duration-300 delay-450"
+             x-transition:enter-start="opacity-0 transform -translate-y-4"
+             x-transition:enter-end="opacity-100 transform translate-y-0">
+            <div class="px-6 py-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-amber-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-amber-100 truncate">Active Borrows</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-white">{{ active_borrows }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Citations -->
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-sm overflow-hidden"
+             x-show="showContent"
+             x-transition:enter="transition ease-out duration-300 delay-600"
+             x-transition:enter-start="opacity-0 transform -translate-y-4"
+             x-transition:enter-end="opacity-100 transform translate-y-0">
+            <div class="px-6 py-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-emerald-100" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-emerald-100 truncate">Total Citations</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-white">{{ total_citations }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Borrow History -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8"
+         x-show="showContent"
+         x-transition:enter="transition ease-out duration-300 delay-750"
+         x-transition:enter-start="opacity-0 transform -translate-y-4"
+         x-transition:enter-end="opacity-100 transform translate-y-0">
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Borrow History</h2>
+        </div>
+        <div class="flow-root">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrow Date</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Return Date</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for borrow in borrow_history %}
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ borrow.user.username }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ borrow.borrow_date|date:"M d, Y" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ borrow.return_date|default:"-"|date:"M d, Y" }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if borrow.is_returned %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Returned
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                        Active
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+<!-- Citations Section -->
+<div class="mt-8">
+    <h2 class="text-2xl font-bold mb-4">Citations</h2>
+    
+    <!-- Add Citation Form -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-lg font-semibold mb-4">Add New Citation</h3>
+        <form action="{% url 'add_citation' paper.id %}" method="post" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="citing_paper_id" class="block text-sm font-medium text-gray-700">Citing Paper</label>
+                <select name="citing_paper_id" id="citing_paper_id" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">Select a paper...</option>
+                    {% for citing_paper in available_papers %}
+                        <option value="{{ citing_paper.id }}">{{ citing_paper.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Add Citation
+            </button>
+        </form>
+    </div>
+
+    <!-- Citations List -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul class="divide-y divide-gray-200">
+            {% for citation in citation_history %}
+            <li class="px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h4 class="text-lg font-medium text-gray-900">{{ citation.cited_by.title }}</h4>
+                    <p class="text-sm text-gray-500">Cited on {{ citation.citation_date }}</p>
+                </div>
+                <form action="{% url 'remove_citation' paper.id citation.id %}" method="post" class="flex-shrink-0">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="text-red-600 hover:text-red-900 focus:outline-none focus:underline"
+                            onclick="return confirm('Are you sure you want to remove this citation?')">
+                        Remove
+                    </button>
+                </form>
+            </li>
+            {% empty %}
+            <li class="px-6 py-4 text-center text-gray-500">
+                No citations found for this paper.
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+    <!-- Citation History -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden"
+         x-show="showContent"
+         x-transition:enter="transition ease-out duration-300 delay-900"
+         x-transition:enter-start="opacity-0 transform -translate-y-4"
+         x-transition:enter-end="opacity-100 transform translate-y-0">
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Citation History</h2>
+        </div>
+        <div class="flow-root">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cited By</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Citation Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for citation in citation_history %}
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ citation.cited_by.title }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ citation.citation_date|date:"M d, Y" }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends 'scholar/base.html' %}
+
+{% block title %}Create Account - Scholar{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 to-emerald-100 pattern-dots text-emerald-900/5">
+    <div class="max-w-2xl w-full">
+        <div class="text-center mb-8">
+            <div class="flex justify-center mb-6">
+                <div class="p-3 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-2xl shadow-lg">
+                    <svg class="h-12 w-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M21 5c0-1.1-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14zm-14 14v-14h14v14h-14zm12-3h-10v-2h10v2zm0-4h-10v-2h10v2zm0-4h-10v-2h10v2z"/>
+                    </svg>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                Create your Digital Hub Account
+            </h2>
+            <p class="text-lg text-gray-600">
+                Join our academic community today
+            </p>
+        </div>
+
+        <div class="bg-white py-8 px-6 shadow-2xl sm:rounded-xl sm:px-12 backdrop-blur-sm bg-opacity-90 border border-emerald-100">
+            <form class="space-y-8" method="post">
+                {% csrf_token %}
+                
+                <!-- Personal Information Section -->
+                <div class="space-y-6">
+                    <div class="border-b border-gray-200 pb-4">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Personal Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="relative">
+                                <input id="id_first_name" name="first_name" type="text" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="First Name">
+                                <label for="id_first_name" 
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    First Name
+                                </label>
+                            </div>
+
+                            <div class="relative">
+                                <input id="id_last_name" name="last_name" type="text" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Last Name">
+                                <label for="id_last_name"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Last Name
+                                </label>
+                            </div>
+
+                            <div class="relative">
+                                <input id="id_email" name="email" type="email" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Email">
+                                <label for="id_email"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Email Address
+                                </label>
+                            </div>
+
+                            <div class="relative">
+                                <input id="id_phone" name="phone" type="tel" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Phone Number">
+                                <label for="id_phone"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Phone Number
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <div class="relative">
+                                <textarea id="id_address" name="address" required rows="3"
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Address"></textarea>
+                                <label for="id_address"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Address
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Information Section -->
+                    <div class="border-b border-gray-200 pb-4">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Academic Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="relative">
+                                <input id="id_student_id" name="student_id" type="text" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Student ID">
+                                <label for="id_student_id"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Student ID
+                                </label>
+                            </div>
+
+                            <div class="relative">
+                                <select id="id_year_level" name="year_level" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 appearance-none bg-white">
+                                    <option value="">Select Year Level</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                    <option value="5">5th Year</option>
+                                </select>
+                                <label for="id_year_level"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600">
+                                    Year Level
+                                </label>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="relative md:col-span-2">
+                                <input id="id_program" name="program" type="text" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Program">
+                                <label for="id_program"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Program
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Credentials Section -->
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-6">Account Credentials</h3>
+                        <div class="space-y-6">
+                            <div class="relative">
+                                <input id="id_username" name="username" type="text" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Username">
+                                <label for="id_username" 
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Username
+                                </label>
+                            </div>
+
+                            <div class="relative">
+                                <input id="id_password1" name="password1" type="password" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Password">
+                                <label for="id_password1"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Password
+                                </label>
+                            </div>
+
+                            <div class="relative">
+                                <input id="id_password2" name="password2" type="password" required
+                                       class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900"
+                                       placeholder="Confirm Password">
+                                <label for="id_password2"
+                                       class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                              peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3.5
+                                              peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                    Confirm Password
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error and message sections remain the same -->
+                {% if form.errors %}
+                    <!-- Keep existing error display -->
+                {% endif %}
+
+                {% if messages %}
+                    <!-- Keep existing messages display -->
+                {% endif %}
+
+                <div class="pt-6">
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                        Create Account
+                    </button>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        Already have an account? 
+                        <a href="{% url 'login' %}" class="font-medium text-emerald-600 hover:text-emerald-500">
+                            Sign in
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

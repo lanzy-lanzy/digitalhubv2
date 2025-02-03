@@ -66,6 +66,7 @@ class Borrow(models.Model):
         ('pending', 'Pending Approval'),
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
+        ('reserved', 'Reserved'),
     ]
 
     RETURN_STATUS_CHOICES = [
@@ -81,6 +82,7 @@ class Borrow(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     return_status = models.CharField(max_length=10, choices=RETURN_STATUS_CHOICES, null=True, blank=True)
     is_returned = models.BooleanField(default=False)  # Add this field
+    due_date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['-borrow_date']
@@ -95,3 +97,11 @@ class Citation(models.Model):
 
     class Meta:
         unique_together = ('paper', 'cited_by')
+
+class Bookmark(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    paper = models.ForeignKey(Paper, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'paper')  # Ensure a user can't bookmark the same paper twice

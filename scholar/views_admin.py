@@ -52,13 +52,17 @@ def manage_papers(request):
         'page_obj': page_obj,
         'search_query': search_query
     })
-
 @staff_member_required
 def manage_borrows(request):
     borrows = Borrow.objects.all().order_by('-borrow_date')
     status_filter = request.GET.get('status')
-    if status_filter == 'active':
-        borrows = borrows.filter(is_returned=False)
+    
+    if status_filter == 'pending':
+        borrows = borrows.filter(status='pending')
+    elif status_filter == 'approved':
+        borrows = borrows.filter(status='approved', is_returned=False)
+    elif status_filter == 'rejected':
+        borrows = borrows.filter(status='rejected')
     elif status_filter == 'returned':
         borrows = borrows.filter(is_returned=True)
     
@@ -70,16 +74,57 @@ def manage_borrows(request):
         'page_obj': page_obj,
         'status_filter': status_filter
     })
+@staff_member_required
+def approve_borrow(request, borrow_id):
+    borrow = get_object_or_404(Borrow, id=borrow_id)
+    
+    if borrow.status == 'pending':
+        borrow.status = 'approved'
+        borrow.save()
+        messages.success(request, 'Borrow request approved.')
+    else:
+        messages.warning(request, 'Borrow request is not pending.')
+    
+    return redirect('manage_borrows')
 
 @staff_member_required
-def return_borrow(request, borrow_id):
-    if request.method == 'POST':
-        borrow = get_object_or_404(Borrow, id=borrow_id)
-        borrow.is_returned = True
-        borrow.return_date = timezone.now()
+def reject_borrow(request, borrow_id):
+    borrow = get_object_or_404(Borrow, id=borrow_id)
+    
+    if borrow.status == 'pending':
+        borrow.status = 'rejected'
         borrow.save()
-        messages.success(request, f'Paper "{borrow.paper.title}" has been marked as returned.')
+        messages.success(request, 'Borrow request rejected.')
+    else:
+        messages.warning(request, 'Borrow request is not pending.')
+    
     return redirect('manage_borrows')
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from .models import Borrow, Paper
+from django.utils import timezone
+
+@staff_member_required
+def mark_returned(request, borrow_id):
+  borrow = get_object_or_404(Borrow, id=borrow_id)
+    
+  if borrow.status == 'approved' and not borrow.is_returned:
+      borrow.is_returned = True
+      borrow.return_date = timezone.now()
+      borrow.save()
+        
+      # Increment available copies of the paper
+      paper = borrow.paper
+      paper.available_copies += 1
+      paper.save()
+        
+      messages.success(request, 'Paper marked as returned.')
+  else:
+      messages.warning(request, 'Paper cannot be marked as returned.')
+    
+  return redirect('manage_borrows')
 
 @staff_member_required
 def paper_analytics(request, paper_id):

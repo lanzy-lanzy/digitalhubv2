@@ -23,6 +23,7 @@
         </form>
     </div>
 
+    
     {% if query %}
         <div class="text-sm text-gray-600 mb-4">
             Showing results for: <span class="font-medium">{{ query }}</span>
@@ -103,37 +104,62 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-4">
                             {% if user.is_authenticated %}
-                            {% if paper.available_copies > 0 %}
-                            {% if user_borrowed_papers and paper.id in user_borrowed_papers %}
-                                <span class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 cursor-not-allowed">
-                                    Already Borrowed
-                                </span>
+                                <!-- Show borrow/reserve options for authenticated users -->
+                                {% if paper.available_copies > 0 %}
+                                    {% if paper.id in user_borrowed_papers %}
+                                        <span class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 cursor-not-allowed">
+                                            Already Borrowed
+                                        </span>
+                                    {% else %}
+                                        <form action="{% url 'borrow_paper' paper.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                Borrow (7 days)
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% else %}
+                                    {% for borrow in borrowed_by_others %}
+                                        {% if borrow.paper.id == paper.id %}
+                                            <form action="{% url 'reserve_paper' paper.id %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="date" name="reserved_date" min="{{ borrow.due_date|date:'Y-m-d' }}" required>
+                                                <button type="submit" 
+                                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                                                    Reserve Paper
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
                             {% else %}
-                                <form action="{% url 'borrow_paper' paper.id %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" 
-                                            class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        <svg class="w-4 h-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
-                                        </svg>
-                                        Borrow
-                                    </button>
-                                </form>
-                            {% endif %}
-                        {% endif %}
-                        
-                                <a href="{% url 'paper_detail' paper.id %}" 
-                                   class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    View Details
-                                </a>
-                            {% else %}
-                                <a href="{% url 'login' %}" 
-                                   class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    <svg class="w-4 h-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                    </svg>
+                                <!-- Show login prompt for anonymous users -->
+                                <a href="{% url 'login' %}"
+       class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     Continue Reading
                                 </a>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            {% if user.is_authenticated %}
+                                {% if paper.id in user_bookmarked_papers %}
+                                    <form action="{% url 'unbookmark_paper' paper.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                            Unbookmark
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <form action="{% url 'bookmark_paper' paper.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" 
+                                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                            Bookmark
+                                        </button>
+                                    </form>
+                                {% endif %}
                             {% endif %}
                         </div>
                         <div class="text-sm text-gray-500">

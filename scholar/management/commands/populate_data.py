@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from scholar.models import Author, Paper, Borrow
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import timedelta
 import random
 
 class Command(BaseCommand):
@@ -56,6 +56,22 @@ class Command(BaseCommand):
             papers.append(paper)
         
         self.stdout.write('Created sample papers')
+
+        # Create one published paper with exactly one available copy
+        exclusive_title = 'Exclusive Published Paper'
+        if not Paper.objects.filter(title__iexact=exclusive_title).exists():
+            exclusive_paper = Paper.objects.create(
+                title=exclusive_title,
+                abstract='This paper is published with only one available copy.',
+                introduction='Introduction for the exclusive published paper.',
+                publication_date=timezone.now().date() - timedelta(days=random.randint(0, 365)),
+                citations=random.randint(0, 100),
+                available_copies=1
+            )
+            # Assign a random author (or more if needed)
+            exclusive_paper.authors.set([random.choice(authors)])
+            papers.append(exclusive_paper)
+            self.stdout.write('Created exclusive published paper with one available copy.')
 
         # Create a test user if it doesn't exist
         test_user, created = User.objects.get_or_create(

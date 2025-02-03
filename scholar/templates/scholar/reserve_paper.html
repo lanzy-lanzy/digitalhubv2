@@ -1,0 +1,13 @@
+{% extends 'scholar/base.html' %}
+
+{% block title %}Reserve Paper{% endblock %}
+
+{% block content %}
+  <h2>Reserve Paper: {{ paper.title }}</h2>
+  <p>The paper is currently due on: {{ current_due|date:"M d, Y" }}</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Reserve</button>
+  </form>
+{% endblock %}

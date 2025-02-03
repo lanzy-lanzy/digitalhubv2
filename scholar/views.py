@@ -2,13 +2,16 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.utils import timezone
-from .models import Paper, Borrow, Student, UserProfile
+from .models import Paper, Borrow, Student, UserProfile,Bookmark, UserProfile
 from django.contrib import messages
 from .forms import StudentRegistrationForm
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
+from datetime import timedelta, datetime
+from django.utils import timezone
+from .forms import ReservationForm
 
 # Create your views here.
 
@@ -23,8 +26,9 @@ def home(request):
             Q(abstract__icontains=query)
         ).distinct()
 
-    # Get the list of borrowed paper IDs by the user
     user_borrowed_papers = []
+    user_bookmarked_papers = []
+
     if request.user.is_authenticated:
         user_borrowed_papers = Borrow.objects.filter(
             user=request.user,
@@ -32,10 +36,24 @@ def home(request):
             is_returned=False
         ).values_list('paper_id', flat=True)
 
+        user_bookmarked_papers = Bookmark.objects.filter(
+            user=request.user
+        ).values_list('paper_id', flat=True)
+
+    borrowed_by_others = Borrow.objects.filter(
+        status='approved',
+        is_returned=False
+    ).exclude(user=request.user).select_related('paper') if request.user.is_authenticated else Borrow.objects.filter(
+        status='approved',
+        is_returned=False
+    ).select_related('paper')
+
     return render(request, 'scholar/home.html', {
         'papers': papers,
         'query': query,
         'user_borrowed_papers': user_borrowed_papers,
+        'borrowed_by_others': borrowed_by_others,
+        'user_bookmarked_papers': user_bookmarked_papers,
     })
 
 def paper_detail(request, paper_id):
@@ -43,7 +61,8 @@ def paper_detail(request, paper_id):
     return render(request, 'scholar/paper_detail.html', {'paper': paper})
 
 
-@login_required
+
+
 @login_required
 def borrow_paper(request, paper_id):
     if request.method != 'POST':
@@ -51,24 +70,44 @@ def borrow_paper(request, paper_id):
         return redirect('paper_detail', paper_id=paper_id)
 
     paper = get_object_or_404(Paper, id=paper_id)
-    
-    if paper.available_copies > 0:
-        # Check if user already has a pending or approved borrow
-        existing_borrow = Borrow.objects.filter(
+
+    if paper.available_copies <= 0:
+        messages.error(request, 'No copies available for borrowing!')
+        return redirect('paper_detail', paper_id=paper_id)
+
+    active_borrows = Borrow.objects.filter(
+        user=request.user,
+        status__in=['pending', 'approved'],
+        is_returned=False
+    )
+    active_paper_ids = active_borrows.values_list('paper_id', flat=True).distinct()
+
+    if paper.id not in active_paper_ids and active_paper_ids.count() >= 2:
+        messages.error(request, 'You cannot borrow more than 2 different papers at a time.')
+        return redirect('paper_detail', paper_id=paper_id)
+
+    existing_borrow = active_borrows.filter(paper=paper).first()
+
+    if not existing_borrow:
+        due_date = timezone.now() + timedelta(days=7)
+        Borrow.objects.create(
             user=request.user,
             paper=paper,
-            status__in=['pending', 'approved']
-        ).first()
-        
-        if not existing_borrow:
-            Borrow.objects.create(user=request.user, paper=paper, status='pending')
-            messages.success(request, 'Borrow request submitted. Awaiting admin approval.')
-        else:
-            messages.warning(request, 'You already have a borrow request for this paper!')
+            status='pending',
+            due_date=due_date
+        )
+        # Decrement available copies for this paper immediately upon borrow request submission.
+        paper.available_copies = paper.available_copies - 1
+        paper.save()
+
+        messages.success(request, f'Borrow request submitted. Please return the paper by {due_date:%Y-%m-%d}.')
     else:
-        messages.error(request, 'No copies available for borrowing!')
-    
+        messages.warning(request, 'You already have a borrow request for this paper!')
+
     return redirect('paper_detail', paper_id=paper_id)
+
+
+
 
 
 @staff_member_required
@@ -335,3 +374,70 @@ from django.shortcuts import redirect
 def logout_view(request):
     logout(request)
     return redirect('home')  # Redirect to the home page after logout
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Paper, Borrow
+from .forms import ReservationForm
+from django.utils import timezone
+from datetime import datetime, timedelta
+
+@login_required
+def reserve_paper(request, paper_id):
+    paper = get_object_or_404(Paper, id=paper_id)
+    active_borrow = Borrow.objects.filter(paper=paper, status='approved', is_returned=False).first()
+    if not active_borrow:
+        messages.error(request, 'This paper is available for immediate borrow. Please borrow it directly.')
+        return redirect('paper_detail', paper_id=paper_id)
+
+    current_due = active_borrow.due_date
+
+    if request.method == 'POST':
+        form = ReservationForm(request.POST)
+        if form.is_valid():
+            reserved_date = form.cleaned_data['reserved_date']
+            if reserved_date <= current_due.date():
+                form.add_error('reserved_date', f'Reservation date must be after the current paper due date: {current_due:%Y-%m-%d}.')
+            else:
+                due_date = timezone.make_aware(datetime.combine(reserved_date, datetime.min.time())) + timedelta(days=7)
+                Borrow.objects.create(
+                    user=request.user,
+                    paper=paper,
+                    status='reserved',
+                    due_date=due_date
+                )
+                messages.success(request, f'Paper reserved successfully. Your borrow period will start on {reserved_date:%Y-%m-%d} and last for 7 days.')
+                return redirect('paper_detail', paper_id=paper_id)
+    else:
+        default_date = current_due.date() + timedelta(days=1)
+        form = ReservationForm(initial={'reserved_date': default_date})
+
+    context = {
+        'form': form,
+        'paper': paper,
+        'current_due': current_due,
+    }
+    return render(request, 'scholar/reserve_paper.html', context)
+
+@login_required
+def bookmark_paper(request, paper_id):
+    paper = get_object_or_404(Paper, id=paper_id)
+    Bookmark.objects.get_or_create(user=request.user, paper=paper)
+    messages.success(request, 'Paper bookmarked successfully.')
+    return redirect('home')
+
+@login_required
+def unbookmark_paper(request, paper_id):
+    paper = get_object_or_404(Paper, id=paper_id)
+    Bookmark.objects.filter(user=request.user, paper=paper).delete()
+    messages.success(request, 'Paper unbookmarked successfully.')
+    return redirect('home')
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Bookmark
+
+@login_required
+def my_bookmarked_papers(request):
+    bookmarks = Bookmark.objects.filter(user=request.user).select_related('paper')
+    return render(request, 'scholar/my_bookmarked_papers.html', {'bookmarks': bookmarks})

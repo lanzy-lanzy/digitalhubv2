@@ -3,9 +3,7 @@
 
 {% block content %}
 <div class="space-y-6">
-    <div class="sm:flex sm:items-center sm:justify-between">
-        <h2 class="text-2xl font-semibold text-gray-900">Manage Borrows</h2>
-    </div>
+    <h2 class="text-2xl font-semibold text-gray-900">Manage Borrows</h2>
 
     <!-- Status Filter -->
     <div class="bg-white shadow rounded-lg">
@@ -53,59 +51,53 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             {% for borrow in page_obj %}
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">{{ borrow.user.username }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ borrow.paper.title }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ borrow.borrow_date }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ borrow.return_date|default:"-" }}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    {% if borrow.status == 'pending' %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                        Pending
-                                    </span>
-                                    {% elif borrow.status == 'approved' %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                        Approved
-                                    </span>
-                                    {% elif borrow.status == 'rejected' %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                        Rejected
-                                    </span>
-                                    {% elif borrow.is_returned %}
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                        Returned
-                                    </span>
-                                    {% endif %}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    {% if borrow.status == 'pending' %}
-                                    <form method="post" action="{% url 'approve_borrow' borrow.id %}" class="inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="text-green-600 hover:text-green-900 mr-3">Approve</button>
-                                    </form>
-                                    <form method="post" action="{% url 'reject_borrow' borrow.id %}" class="inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="text-red-600 hover:text-red-900 mr-3">Reject</button>
-                                    </form>
-                                    {% elif borrow.status == 'approved' and not borrow.is_returned %}
-                                    <form method="post" action="{% url 'return_borrow' borrow.id %}" class="inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="text-blue-600 hover:text-blue-900 mr-3">Mark Returned</button>
-                                    </form>
-                                    {% endif %}
-                                    <a href="{% url 'admin:scholar_borrow_change' borrow.id %}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">{{ borrow.user.username }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ borrow.paper.title }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ borrow.borrow_date }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ borrow.return_date|default:"-" }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        {% if borrow.is_returned %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Returned
+                                        </span>
+                                        {% elif borrow.status == 'pending' %}
+                                        <span class极px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Pending
+                                        </span>
+                                        {% elif borrow.status == 'approved' %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            Approved
+                                        </span>
+                                        {% elif borrow.status == 'rejected' %}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                            Rejected
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        {% if borrow.status == 'approved' and not borrow.is_returned %}
+                                        <form method="post" action="{% url 'mark_returned' borrow.id %}" class="inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="text-blue-600 hover:text-blue-900 mr-3">
+                                                <i class="fas fa-check"></i> Mark Returned
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                        <a href="{% url 'admin:scholar_borrow_change' borrow.id %}" class="text-indigo-600 hover:text-indigo-900">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}                        </tbody>
                     </table>
                 </div>
             </div>

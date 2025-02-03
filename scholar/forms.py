@@ -28,6 +28,15 @@ class PaperUploadForm(forms.ModelForm):
             raise forms.ValidationError("Please enter at least one author")
         return author_names
 
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get('title')
+        # If this is a new paper being published, ensure that no other paper with the same title exists.
+        # When editing an existing paper, self.instance will have a PK.
+        if title and not self.instance.pk and Paper.objects.filter(title__iexact=title).exists():
+            raise forms.ValidationError("A paper with this title has already been published.")
+        return cleaned_data
+
     def save(self, commit=True):
         paper = super().save(commit=False)
         if commit:
@@ -38,6 +47,7 @@ class PaperUploadForm(forms.ModelForm):
                 author, _ = Author.objects.get_or_create(name=name)
                 paper.authors.add(author)
         return paper
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -88,3 +98,20 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
+
+from django import forms
+from django.utils import timezone
+from datetime import timedelta
+
+class ReservationForm(forms.Form):
+    reserved_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        label='Reservation Date'
+    )
+
+    def clean_reserved_date(self):
+        reserved_date = self.cleaned_data['reserved_date']
+        # Ensure the reserved date is in the future
+        if reserved_date <= timezone.now().date():
+            raise forms.ValidationError("Reservation date must be in the future.")
+        return reserved_date       

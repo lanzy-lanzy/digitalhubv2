@@ -1,0 +1,55 @@
+{% extends 'scholar/base.html' %}
+
+{% block title %}Settings - Digital Hub{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+    
+    <!-- User Information -->
+    <div class="space-y-6">
+        <!-- Account Settings -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Account Settings</h2>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-500">Username</p>
+                    <p class="text-lg font-medium text-gray-900">{{ user.username }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Email</p>
+                    <p class="text-lg font-medium text-gray-900">{{ user.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Security</h2>
+            <div class="space-y-4">
+                <a href="{% url 'change_password' %}" 
+                   class="group flex items-center justify-between px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                    <span class="text-sm font-medium text-gray-900">Change Password</span>
+                    <svg class="h-5 w-5 text-gray-400 group-hover:text-gray-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Notifications</h2>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-900">Email Notifications</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

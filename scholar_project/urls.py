@@ -16,11 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from scholar.views import home  # Import the home view
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('django-admin/', admin.site.urls),
-    path('', include('scholar.urls')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('admin/', admin.site.urls),
+    path('login/', include('django.contrib.auth.urls')),  # Default Django auth URLs
+    path('accounts/', include('scholar.urls')),  # Your custom URLs
+    path('', home, name='home'),  # Map the root URL to the home view
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

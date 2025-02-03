@@ -1,0 +1,104 @@
+{% if user.is_staff %}
+<div class="relative" x-data="{ open: false }">
+    <!-- Admin Panel Button -->
+    <button @click="open = !open" 
+            @mouseenter="open = true"
+            class="group inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {% if '/admin/' in request.path %}text-white bg-gradient-to-r from-emerald-600 to-emerald-700 shadow-lg hover:from-emerald-700 hover:to-emerald-800{% else %}text-gray-700 hover:text-gray-900 hover:bg-emerald-50{% endif %}">
+        <svg class="mr-2 h-5 w-5 {% if '/admin/' in request.path %}text-white{% else %}text-gray-500 group-hover:text-gray-700{% endif %}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+        </svg>
+        <span>Admin Panel</span>
+        <svg class="ml-2 h-4 w-4 transition-transform duration-200 {% if '/admin/' in request.path %}text-white/80{% else %}text-gray-500 group-hover:text-gray-700{% endif %}" :class="{ 'transform rotate-180': open }" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+    </button>
+
+    <!-- Admin Dropdown Menu -->
+    <div x-show="open" 
+         @click.away="open = false"
+         @mouseleave="open = false"
+         class="absolute right-0 z-50 mt-2 w-72 origin-top-right rounded-xl bg-white shadow-2xl ring-1 ring-emerald-500/10 ring-opacity-5 focus:outline-none divide-y divide-gray-100 transform transition-all duration-200"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+        
+        <!-- Quick Stats Section -->
+        <div class="p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-t-xl">
+            <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Quick Stats</h3>
+            <div class="mt-3 grid grid-cols-2 gap-3">
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                    <p class="text-xs text-gray-500">Total Papers</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ total_papers|default:"0" }}</p>
+                </div>
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                    <p class="text-xs text-gray-500">Active Borrows</p>
+                    <p class="text-lg font-semibold text-gray-900">{{ active_borrows|default:"0" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Actions Section -->
+        <div class="py-2">
+            <a href="{% url 'admin_dashboard' %}" 
+               class="group flex items-center px-4 py-3 transition-colors duration-200 hover:bg-emerald-50 {% if request.path == '/admin/dashboard/' %}bg-emerald-50/50{% endif %}">
+                <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm">
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V4zM8 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H9a1 1 0 01-1-1V4zM15 3a1 1 0 00-1 1v12a1 1 0 001 1h2a1 1 0 001-1V4a1 1 0 00-1-1h-2z" />
+                    </svg>
+                </span>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Dashboard</p>
+                    <p class="text-xs text-gray-500">View analytics and reports</p>
+                </div>
+            </a>
+            <a href="{% url 'manage_papers' %}" 
+               class="group flex items-center px-4 py-3 transition-colors duration-200 hover:bg-emerald-50 {% if request.path == '/admin/papers/' %}bg-emerald-50/50{% endif %}">
+                <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 group-hover:bg-gray-200 group-hover:text-gray-600 shadow-sm">
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                </span>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Manage Papers</p>
+                    <p class="text-xs text-gray-500">Add, edit, or remove papers</p>
+                </div>
+            </a>
+            <a href="{% url 'admin_pending_registrations' %}" 
+            class="group flex items-center px-4 py-3 transition-colors duration-200 hover:bg-emerald-50 {% if request.path == '/admin/pending-registrations/' %}bg-emerald-50/50{% endif %}">
+             <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 group-hover:bg-gray-200 group-hover:text-gray-600 shadow-sm">
+                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                     <path fill-rule="evenodd" d="M6 2a1 1 0 011 1v1h4a1 1 0 010 2H7v1a1 1 0 01-2 0V6H3a1 1 0 010-2h2V3a1 1 0 011-1zm0 5a1 1 0 011 1v3a1 1 0 11-2 0V8a1 1 0 011-1zm12 0a1 1 0 011 1v3a1 1 0 11-2 0V8a1 1 0 011-1zM9 13a1 1 0 011-1h4a1 1 0 110 2h-4a1 1 0 01-1-1zm-3 0a1 1 0 011-1h4a1 1 0 110 2H7a1 1 0 01-1-1z" clip-rule="evenodd" />
+                 </svg>
+             </span>
+             <div class="ml-4">
+                 <p class="text-sm font-medium text-gray-900">Pending Registrations</p>
+                 <p class="text-xs text-gray-500">Review and approve new users</p>
+             </div>
+         </a>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="py-2">
+            <div class="px-4 py-2">
+                <h3 class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Quick Actions</h3>
+            </div>
+            <a href="{% url 'upload_paper' %}" 
+               class="group flex items-center px-4 py-3 transition-colors duration-200 hover:bg-emerald-50 {% if request.path == '/admin/papers/upload/' %}bg-emerald-50/50{% endif %}">
+                <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm">
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1V4zM8 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H9a1 1 0 01-1-1V4zM15 3a1 1 0 00-1 1v12a1 1 0 001 1h2a1 1 0 001-1V4a1 1 0 00-1-1h-2z" />
+                    </svg>
+                </span>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">Upload New Paper</p>
+                    <p class="text-xs text-gray-500">Add a new paper to the library</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}

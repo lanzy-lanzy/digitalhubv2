@@ -60,28 +60,13 @@ class PaperAdmin(admin.ModelAdmin):
                 paper.save()
     decrement_copies.short_description = "Remove one copy from selected papers"
 
+from .models import Borrow
+
 @admin.register(Borrow)
 class BorrowAdmin(admin.ModelAdmin):
-    list_display = ('user', 'paper', 'borrow_date', 'return_date', 'is_returned', 'borrow_duration')
-    list_filter = ('is_returned', 'borrow_date', 'return_date')
-    search_fields = ('user__username', 'user__email', 'paper__title')
-    readonly_fields = ('borrow_date',)
-    actions = ['mark_as_returned']
-    date_hierarchy = 'borrow_date'
-    
-    def borrow_duration(self, obj):
-        if obj.is_returned and obj.return_date:
-            duration = obj.return_date - obj.borrow_date
-            return f"{duration.days} days"
-        elif not obj.is_returned:
-            duration = timezone.now() - obj.borrow_date
-            return f"{duration.days} days (ongoing)"
-        return "N/A"
-    borrow_duration.short_description = "Duration"
-
-    def mark_as_returned(self, request, queryset):
-        queryset.update(is_returned=True, return_date=timezone.now())
-    mark_as_returned.short_description = "Mark selected borrows as returned"
+    list_display = ('user', 'paper', 'borrow_date', 'status')
+    list_filter = ('status',)
+    search_fields = ('user__username', 'paper__title')
 
 @admin.register(Citation)
 class CitationAdmin(admin.ModelAdmin):

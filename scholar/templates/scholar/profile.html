@@ -1,0 +1,42 @@
+{% extends 'scholar/base.html' %}
+
+{% block title %}Profile - Digital Hub{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Your Profile</h1>
+    
+    <!-- User Information -->
+    <div class="space-y-4">
+        <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                {{ user.username|make_list|first|upper }}
+            </div>
+            <div>
+                <p class="text-lg font-semibold text-gray-900">{{ user.username|title }}</p>
+                <p class="text-sm text-gray-500">{{ user.email }}</p>
+            </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="mt-6 space-y-4">
+            <div>
+                <p class="text-sm text-gray-500">Full Name</p>
+                <p class="text-lg font-medium text-gray-900">{{ user.get_full_name|default:"Not provided" }}</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Joined On</p>
+                <p class="text-lg font-medium text-gray-900">{{ user.date_joined|date:"F j, Y" }}</p>
+            </div>
+        </div>
+
+        <!-- Edit Profile Button -->
+        <div class="mt-8">
+            <a href="{% url 'edit_profile' %}" 
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

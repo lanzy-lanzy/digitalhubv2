@@ -7,6 +7,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=20)
     address = models.TextField()
+    is_approved = models.BooleanField(default=False)  # Add this field
 
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username}'s Profile"
@@ -61,19 +62,33 @@ class Paper(models.Model):
         return self.title
 
 class Borrow(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    RETURN_STATUS_CHOICES = [
+        ('pending', 'Pending Return Approval'),
+        ('approved', 'Return Approved'),
+        ('rejected', 'Return Rejected'),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     paper = models.ForeignKey(Paper, on_delete=models.CASCADE)
     borrow_date = models.DateTimeField(auto_now_add=True)
     return_date = models.DateTimeField(null=True, blank=True)
-    is_returned = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    return_status = models.CharField(max_length=10, choices=RETURN_STATUS_CHOICES, null=True, blank=True)
+    is_returned = models.BooleanField(default=False)  # Add this field
 
     class Meta:
         ordering = ['-borrow_date']
 
     def __str__(self):
         return f"{self.user.username} - {self.paper.title}"
-
 class Citation(models.Model):
+    
     paper = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='paper_citations')
     cited_by = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='cited_papers')
     citation_date = models.DateField(auto_now_add=True)

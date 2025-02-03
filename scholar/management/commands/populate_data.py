@@ -70,14 +70,16 @@ class Command(BaseCommand):
             test_user.save()
             self.stdout.write('Created test user')
 
-        # Create some borrow records
+        # Create some borrow records with status
         for _ in range(3):
             paper = random.choice(papers)
+            status = random.choice(['pending', 'approved', 'rejected'])
             Borrow.objects.create(
                 user=test_user,
                 paper=paper,
                 borrow_date=timezone.now() - timedelta(days=random.randint(1, 30)),
-                is_returned=random.choice([True, False])
+                is_returned=random.choice([True, False]),
+                status=status
             )
         
         self.stdout.write('Created sample borrow records')

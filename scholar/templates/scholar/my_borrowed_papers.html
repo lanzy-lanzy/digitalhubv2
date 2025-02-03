@@ -60,7 +60,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         {% if borrow.status == 'approved' and not borrow.return_status %}
                         <a href="{% url 'request_return' borrow.id %}" class="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-                            Request Return
+                            Request Return?
                         </a>
                         {% endif %}
                     </td>

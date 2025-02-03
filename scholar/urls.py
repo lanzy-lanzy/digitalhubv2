@@ -8,7 +8,7 @@ from .views import (
 )
 
 urlpatterns = [
-    path('', views.home, name='home'),
+    # path('', views.home, name='home'),
     path('paper/<int:paper_id>/', views.paper_detail, name='paper_detail'),
     path('paper/<int:paper_id>/borrow/', views.borrow_paper, name='borrow_paper'),
     path('my-borrowed-papers/', views.my_borrowed_papers, name='my_borrowed_papers'),

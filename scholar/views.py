@@ -44,26 +44,32 @@ def paper_detail(request, paper_id):
 
 
 @login_required
+@login_required
 def borrow_paper(request, paper_id):
-      paper = get_object_or_404(Paper, id=paper_id)
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request method.')
+        return redirect('paper_detail', paper_id=paper_id)
+
+    paper = get_object_or_404(Paper, id=paper_id)
     
-      if paper.available_copies > 0:
-          # Check if user already has a pending or approved borrow
-          existing_borrow = Borrow.objects.filter(
-              user=request.user,
-              paper=paper,
-              status__in=['pending', 'approved']
-          ).first()
+    if paper.available_copies > 0:
+        # Check if user already has a pending or approved borrow
+        existing_borrow = Borrow.objects.filter(
+            user=request.user,
+            paper=paper,
+            status__in=['pending', 'approved']
+        ).first()
         
-          if not existing_borrow:
-              Borrow.objects.create(user=request.user, paper=paper, status='pending')
-              messages.success(request, 'Borrow request submitted. Awaiting admin approval.')
-          else:
-              messages.warning(request, 'You already have a borrow request for this paper!')
-      else:
-          messages.error(request, 'No copies available for borrowing!')
+        if not existing_borrow:
+            Borrow.objects.create(user=request.user, paper=paper, status='pending')
+            messages.success(request, 'Borrow request submitted. Awaiting admin approval.')
+        else:
+            messages.warning(request, 'You already have a borrow request for this paper!')
+    else:
+        messages.error(request, 'No copies available for borrowing!')
     
-      return redirect('paper_detail', paper_id=paper_id)
+    return redirect('paper_detail', paper_id=paper_id)
+
 
 @staff_member_required
 def approve_borrow(request, borrow_id):
@@ -171,32 +177,40 @@ from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
 from .forms import StudentRegistrationForm  # Import your registration form
 
+from django.db import transaction
+from django.db import transaction
+from django.shortcuts import redirect
+from django.contrib import messages
+
 class RegisterView(CreateView):
     form_class = StudentRegistrationForm
     template_name = 'registration/register.html'
-    success_url = reverse_lazy('login')  # Redirect to login page after successful registration
+    success_url = reverse_lazy('login')
 
     def form_valid(self, form):
         try:
-            # Save the user
-            user = form.save(commit=False)
-            user.is_active = False  # Deactivate the user until approved
-            user.save()
+            with transaction.atomic():
+                # Create and save the user, but do not commit immediately
+                user = form.save(commit=False)
+                user.is_active = False  # Deactivate until admin approval
+                user.save()
+                
+                # Create UserProfile if one doesn't exist
+                profile, created = UserProfile.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'phone': form.cleaned_data['phone'],
+                        'address': form.cleaned_data['address'],
+                        'is_approved': False,
+                    }
+                )
 
-            # Create the UserProfile with is_approved=False
-            UserProfile.objects.create(
-                user=user,
-                phone=form.cleaned_data['phone'],
-                address=form.cleaned_data['address'],
-                is_approved=False
-            )
-
-            messages.success(self.request, 'Registration successful! Awaiting admin approval.')
-            return redirect(self.success_url)
+                messages.success(self.request, 'Registration successful! Awaiting admin approval.')
+                return redirect(self.success_url)
         except Exception as e:
             messages.error(self.request, f'An error occurred during registration: {str(e)}')
             return self.form_invalid(form)
-      
+
 def admin_dashboard(request):
     if not request.user.is_staff:
         return redirect('home')
@@ -314,3 +328,10 @@ def settings(request):
         'user': user,
     }
     return render(request, 'scholar/settings.html', context)
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')  # Redirect to the home page after logout

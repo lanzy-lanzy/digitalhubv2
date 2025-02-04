@@ -14,50 +14,65 @@ from django.utils import timezone
 from .forms import ReservationForm
 
 # Create your views here.
+from django.contrib.sessions.models import Session
+from django.utils import timezone
 
 def home(request):
-    query = request.GET.get('q', '')
-    papers = Paper.objects.all()
+      query = request.GET.get('q', '')
+      papers = Paper.objects.all()
 
-    if query:
-        papers = papers.filter(
-            Q(title__icontains=query) |
-            Q(authors__name__icontains=query) |
-            Q(abstract__icontains=query)
-        ).distinct()
+      if query:
+          papers = papers.filter(
+              Q(title__icontains=query) |
+              Q(authors__name__icontains=query) |
+              Q(abstract__icontains=query)
+          ).distinct()
 
-    user_borrowed_papers = []
-    user_bookmarked_papers = []
+      user_borrowed_papers = []
+      user_bookmarked_papers = []
 
-    if request.user.is_authenticated:
-        user_borrowed_papers = Borrow.objects.filter(
-            user=request.user,
-            status='approved',
-            is_returned=False
-        ).values_list('paper_id', flat=True)
+      if request.user.is_authenticated:
+          user_borrowed_papers = Borrow.objects.filter(
+              user=request.user,
+              status='approved',
+              is_returned=False
+          ).values_list('paper_id', flat=True)
 
-        user_bookmarked_papers = Bookmark.objects.filter(
-            user=request.user
-        ).values_list('paper_id', flat=True)
+          user_bookmarked_papers = Bookmark.objects.filter(
+              user=request.user
+          ).values_list('paper_id', flat=True)
 
-    borrowed_by_others = Borrow.objects.filter(
-        status='approved',
-        is_returned=False
-    ).exclude(user=request.user).select_related('paper') if request.user.is_authenticated else Borrow.objects.filter(
-        status='approved',
-        is_returned=False
-    ).select_related('paper')
+      borrowed_by_others = Borrow.objects.filter(
+          status='approved',
+          is_returned=False
+      ).exclude(user=request.user).select_related('paper') if request.user.is_authenticated else Borrow.objects.filter(
+          status='approved',
+          is_returned=False
+      ).select_related('paper')
 
-    return render(request, 'scholar/home.html', {
-        'papers': papers,
-        'query': query,
-        'user_borrowed_papers': user_borrowed_papers,
-        'borrowed_by_others': borrowed_by_others,
-        'user_bookmarked_papers': user_bookmarked_papers,
-    })
+      # Track active viewers
+      active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
+      active_viewers = len(active_sessions)
 
+      return render(request, 'scholar/home.html', {
+          'papers': papers,
+          'query': query,
+          'user_borrowed_papers': user_borrowed_papers,
+          'borrowed_by_others': borrowed_by_others,
+          'user_bookmarked_papers': user_bookmarked_papers,
+          'active_viewers': active_viewers,  # Pass the number of active viewers to the template
+      })
 def paper_detail(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)
+    session_key = f'viewed_paper_{paper_id}'
+
+    if not request.session.get(session_key, False):
+        paper.view_count += 1  # Increment the view count
+        if request.user.is_authenticated:
+            paper.viewers.add(request.user)  # Add the user to the viewers list
+        paper.save()
+        request.session[session_key] = True  # Mark the paper as viewed
+
     return render(request, 'scholar/paper_detail.html', {'paper': paper})
 
 
@@ -151,8 +166,8 @@ def request_return(request, borrow_id):
     """
     borrow = get_object_or_404(Borrow, id=borrow_id, user=request.user)
 
-    if borrow.status == 'approved' and not borrow.return_status:
-        borrow.return_status = 'pending'
+    if borrow.status == 'approved' and not borrow.is_returned:
+        borrow.return_status = 'pending'  # Set return status to 'pending'
         borrow.save()
         messages.success(request, 'Return request submitted. Awaiting admin approval.')
     else:
@@ -441,3 +456,17 @@ from .models import Bookmark
 def my_bookmarked_papers(request):
     bookmarks = Bookmark.objects.filter(user=request.user).select_related('paper')
     return render(request, 'scholar/my_bookmarked_papers.html', {'bookmarks': bookmarks})
+
+from django.shortcuts import render
+from scholar.models import Borrow
+
+def admin_reports(request):
+    borrows = Borrow.objects.all()
+    return render(request, 'scholar/admin_reports.html', {'borrows': borrows})
+
+from django.shortcuts import render, get_object_or_404
+from scholar.models import Borrow
+
+def view_borrow(request, borrow_id):
+    borrow = get_object_or_404(Borrow, id=borrow_id)
+    return render(request, 'scholar/view_borrow.html', {'borrow': borrow})

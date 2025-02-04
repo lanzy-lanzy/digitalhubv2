@@ -84,17 +84,28 @@
                                         {% endif %}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        {% if borrow.status == 'approved' and not borrow.is_returned %}
-                                        <form method="post" action="{% url 'mark_returned' borrow.id %}" class="inline">
-                                            {% csrf_token %}
-                                            <button type="submit" class="text-blue-600 hover:text-blue-900 mr-3">
-                                                <i class="fas fa-check"></i> Mark Returned
-                                            </button>
-                                        </form>
+                                        {% if borrow.status == 'pending' %}
+                                            <form method="post" action="{% url 'approve_borrow' borrow.id %}" class="inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-green-600 hover:text-green-900 mr-3">
+                                                    <i class="fas fa-check"></i> Approve
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{% url 'reject_borrow' borrow.id %}" class="inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-red-600 hover:text-red-900 mr-3">
+                                                    <i class="fas fa-times"></i> Reject
+                                                </button>
+                                            </form>
                                         {% endif %}
-                                        <a href="{% url 'admin:scholar_borrow_change' borrow.id %}" class="text-indigo-600 hover:text-indigo-900">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
+                                        {% if borrow.status == 'approved' and not borrow.is_returned %}
+                                            <form method="post" action="{% url 'mark_returned' borrow.id %}" class="inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-blue-600 hover:text-blue-900 mr-3">
+                                                    <i class="fas fa-check"></i> Mark Returned
+                                                </button>
+                                            </form>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}                        </tbody>

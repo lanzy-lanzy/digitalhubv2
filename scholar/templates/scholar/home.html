@@ -59,6 +59,10 @@
                                     <span class="text-gray-400">•</span>
                                     <span>{{ paper.citations }} citations</span>
                                 {% endif %}
+                                <span class="text-gray-400">•</span>
+                                <span>{{ paper.view_count }} views</span>  <!-- Display total views -->
+                                <span class="text-gray-400">•</span>
+                                <span>{{ paper.viewers.count }} unique viewers</span>  <!-- Display unique viewers -->
                             </div>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -79,26 +83,23 @@
                 <div class="p-6">
                     <!-- Abstract -->
                     <div class="mb-4">
-                        <h3 class="text-sm font-semibold text-gray-900 mb-2">Abstract</h3>
-                        <p class="text-gray-700 text-sm leading-relaxed">{{ paper.abstract }}</p>
-                    </div>
-
-                    <!-- Introduction Preview -->
-                    {% if paper.introduction %}
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2">Introduction</h3>
-                            <div class="relative">
-                                <div class="text-gray-700 text-sm leading-relaxed {% if not user.is_authenticated %}line-clamp-3{% endif %}">
-                                    {{ paper.introduction }}
-                                </div>
-                                {% if not user.is_authenticated %}
-                                    <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
-                                {% endif %}
-                            </div>
+                        <div class="mb-4">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-2">Abstract</h3>
+                            <p class="text-gray-700 text-sm leading-relaxed no-copy">{{ paper.abstract }}</p>
                         </div>
-                    {% endif %}
-                </div>
 
+                        <!-- Introduction Preview -->
+                        {% if paper.introduction %}
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-900 mb-2">Introduction</h3>
+                                <div class="relative">
+                                    <div class="text-gray-700 text-sm leading-relaxed no-copy">
+                                        {{ paper.introduction }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
                 <!-- Paper Footer -->
                 <div class="px-6 py-4 bg-gray-50 rounded-b-lg border-t border-gray-100">
                     <div class="flex items-center justify-between">
@@ -136,7 +137,7 @@
                             {% else %}
                                 <!-- Show login prompt for anonymous users -->
                                 <a href="{% url 'login' %}"
-       class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     Continue Reading
                                 </a>
                             {% endif %}
@@ -176,7 +177,8 @@
                 <h3 class="mt-4 text-lg font-medium text-gray-900">No results found</h3>
                 <p class="mt-2 text-gray-500">Try adjusting your search terms or filters</p>
             </div>
-        {% endfor %}
-    </div>
+        {% endfor %}    </div>
 </div>
 {% endblock %}
+
+

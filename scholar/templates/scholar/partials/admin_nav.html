@@ -92,6 +92,19 @@
                  <p class="text-xs text-gray-500">Review and approve new users</p>
              </div>
          </a>
+         <a href="{% url 'admin_reports' %}" 
+         class="group flex items-center px-4 py-3 transition-colors duration-200 hover:bg-emerald-50 {% if request.path == '/admin/reports/' %}bg-emerald-50/50{% endif %}">
+          <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 group-hover:bg-gray-200 group-hover:text-gray-600 shadow-sm">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm2 2a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V6a1 1 0 00-1-1H5z" clip-rule="evenodd" />
+              </svg>
+          </span>
+          <div class="ml-4">
+              <p class="text-sm font-medium text-gray-900">Reports</p>
+              <p class="text-xs text-gray-500">Generate and view system reports</p>
+          </div>
+      </a>
+
         </div>
 
         <!-- Quick Actions Section -->

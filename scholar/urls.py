@@ -4,7 +4,8 @@ from . import views, views_admin
 from .views import (
     RegisterView, admin_pending_registrations, approve_registration, reject_registration,
     approve_borrow, reject_borrow, admin_borrow_requests, request_return, approve_return,
-    reject_return, admin_return_requests, user_login, profile, settings,edit_profile,bookmark_paper, unbookmark_paper,my_bookmarked_papers
+    reject_return, admin_return_requests, user_login, profile, settings,edit_profile,bookmark_paper, 
+    unbookmark_paper,my_bookmarked_papers,view_borrow
 )
 
 urlpatterns = [
@@ -47,6 +48,9 @@ urlpatterns = [
     path('unbookmark/<int:paper_id>/', unbookmark_paper, name='unbookmark_paper'),
 
     path('my_bookmarked_papers/', my_bookmarked_papers, name='my_bookmarked_papers'),
+
+    path('admin/reports/', views.admin_reports, name='admin_reports'),
+     path('admin/borrows/<int:borrow_id>/', view_borrow, name='view_borrow'),
 ]
 
 

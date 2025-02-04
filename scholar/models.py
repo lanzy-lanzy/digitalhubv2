@@ -49,18 +49,17 @@ class Author(models.Model):
         return self.name
 
 class Paper(models.Model):
-    title = models.CharField(max_length=500)
-    authors = models.ManyToManyField(Author)
+    title = models.CharField(max_length=255)
+    authors = models.ManyToManyField('Author', related_name='papers')
     abstract = models.TextField()
-    introduction = models.TextField(blank=True, help_text="Introduction section of the paper")
     publication_date = models.DateField()
-    citations = models.IntegerField(default=0)
-    pdf_file = models.FileField(upload_to='papers/', null=True, blank=True)
-    available_copies = models.IntegerField(default=1)
+    citations = models.PositiveIntegerField(default=0)
+    available_copies = models.PositiveIntegerField(default=1)
+    view_count = models.PositiveIntegerField(default=0)  # Total views
+    viewers = models.ManyToManyField(User, related_name='viewed_papers', blank=True)  # Track unique viewers
 
     def __str__(self):
         return self.title
-
 class Borrow(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending Approval'),

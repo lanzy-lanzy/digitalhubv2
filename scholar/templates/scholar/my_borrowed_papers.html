@@ -3,7 +3,7 @@
 {% block title %}My Borrowed Papers{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px极4 py-8">
+<div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-800 mb-6">My Borrowed Papers</h1>
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -19,8 +19,11 @@
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Return Date
                     </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-极500 uppercase tracking-wider">
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Status
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
                     </th>
                 </tr>
             </thead>
@@ -55,10 +58,63 @@
                         </span>
                         {% endif %}
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if borrow.status == 'approved' and not borrow.is_returned %}
+                            {% if borrow.return_status == 'pending' %}
+                                <button class="px-4 py-2 bg-gray-500 text-white rounded cursor-not-allowed" disabled>
+                                    Return Requested
+                                </button>
+                            {% else %}
+                                <form action="{% url 'request_return' borrow.id %}" method="post" class="return-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 return-button">
+                                        Return
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    // Add event listeners to all return forms
+    document.querySelectorAll('.return-form').forEach(form => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the default form submission
+
+            const button = form.querySelector('.return-button');
+            button.disabled = true; // Disable the button to prevent multiple submissions
+            button.textContent = 'Submitting...'; // Update button text
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                });
+
+                if (response.ok) {
+                    button.textContent = 'Return Requested'; // Update button text
+                    button.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    button.classList.add('bg-gray-500', 'cursor-not-allowed'); // Change button style
+                } else {
+                    alert('Failed to submit return request. Please try again.');
+                    button.disabled = false;
+                    button.textContent = 'Return';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                button.disabled = false;
+                button.textContent = 'Return';
+            }
+        });
+    });
+</script>
 {% endblock %}

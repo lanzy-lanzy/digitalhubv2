@@ -67,13 +67,25 @@ def paper_detail(request, paper_id):
     session_key = f'viewed_paper_{paper_id}'
 
     if not request.session.get(session_key, False):
-        paper.view_count += 1  # Increment the view count
+        paper.view_count += 1
         if request.user.is_authenticated:
-            paper.viewers.add(request.user)  # Add the user to the viewers list
+            paper.viewers.add(request.user)
         paper.save()
-        request.session[session_key] = True  # Mark the paper as viewed
+        request.session[session_key] = True
 
-    return render(request, 'scholar/paper_detail.html', {'paper': paper})
+    # Fetch user's borrowed papers
+    user_borrowed_papers = []
+    if request.user.is_authenticated:
+        user_borrowed_papers = Borrow.objects.filter(
+            user=request.user,
+            status='approved',
+            is_returned=False
+        ).values_list('paper_id', flat=True)
+
+    return render(request, 'scholar/paper_detail.html', {
+        'paper': paper,
+        'user_borrowed_papers': user_borrowed_papers,
+    })
 
 
 

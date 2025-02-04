@@ -60,9 +60,8 @@
                                     <span>{{ paper.citations }} citations</span>
                                 {% endif %}
                                 <span class="text-gray-400">•</span>
-                                <span>{{ paper.view_count }} views</span>  <!-- Display total views -->
-                                <span class="text-gray-400">•</span>
-                                <span>{{ paper.viewers.count }} unique viewers</span>  <!-- Display unique viewers -->
+                                <span class="flex items-center"><svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>{{ paper.view_count }} views</span>  <!-- Display total views -->                                <span class="text-gray-400">•</span>
+                                {% comment %} <span>{{ paper.viewers.count }} unique viewers</span>  <!-- Display unique viewers --> {% endcomment %}
                             </div>
                         </div>
                         <div class="flex items-center space-x-2">
@@ -123,24 +122,33 @@
                                 {% else %}
                                     {% for borrow in borrowed_by_others %}
                                         {% if borrow.paper.id == paper.id %}
-                                            <form action="{% url 'reserve_paper' paper.id %}" method="post">
+                                            {% comment %} <form action="{% url 'reserve_paper' paper.id %}" method="post">
                                                 {% csrf_token %}
                                                 <input type="date" name="reserved_date" min="{{ borrow.due_date|date:'Y-m-d' }}" required>
                                                 <button type="submit" 
                                                         class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                                                     Reserve Paper
                                                 </button>
-                                            </form>
+                                            </form> {% endcomment %}
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
                             {% else %}
                                 <!-- Show login prompt for anonymous users -->
                                 <a href="{% url 'login' %}"
-        class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     Continue Reading
                                 </a>
                             {% endif %}
+                            <!-- Add View Details Button -->
+                            <a href="{% url 'paper_detail' paper.id %}"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                                </svg>
+                                View Details
+                            </a>
                         </div>
                         <div class="flex items-center space-x-4">
                             {% if user.is_authenticated %}
@@ -167,8 +175,7 @@
                             Published {{ paper.publication_date|date:"M d, Y" }}
                         </div>
                     </div>
-                </div>
-            </div>
+                </div>            </div>
         {% empty %}
             <div class="bg-white rounded-lg p-8 text-center shadow-sm">
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

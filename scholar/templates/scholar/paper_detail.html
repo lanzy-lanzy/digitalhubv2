@@ -10,43 +10,120 @@
         -ms-user-select: none;
         user-select: none;
     }
+    .pdf-container {
+        position: relative;
+        width: 100%;
+        max-width: 900px;
+        height: 80vh; /* Fullscreen-like scrolling */
+        margin: auto;
+        background: white;
+        border-radius: 10px;
+        overflow-y: auto;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        scrollbar-width: thin;
+        scrollbar-color: #4a5568 #e2e8f0;
+    }
+    .pdf-container::-webkit-scrollbar {
+        width: 8px;
+    }
+    .pdf-container::-webkit-scrollbar-thumb {
+        background: #4a5568;
+        border-radius: 10px;
+    }
+    .pdf-container::-webkit-scrollbar-track {
+        background: #e2e8f0;
+    }
+    .pdf-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #1f2937;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 10px 10px 0 0;
+    }
+    .pdf-toolbar button {
+        background: #4b5563;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: background 0.2s ease-in-out;
+    }
+    .pdf-toolbar button:hover {
+        background: #6b7280;
+    }
 </style>
-  <div class="bg-white rounded-lg shadow-sm p-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-4">{{ paper.title }}</h1>
-      <div class="paper-meta">
-        <span class="flex items-center"><svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>{{ paper.view_count }} views</span>  <!-- Display total views -->                                
-          {% comment %} <p>Unique Viewers: {{ paper.viewers.count }}</p> {% endcomment %}
-      </div>
-      <div class="text-sm text-gray-600 mb-4">
-          <span class="font-medium">Authors:</span>
-          {% for author in paper.authors.all %}
-              {% if not forloop.first %}, {% endif %}
-              {{ author.name }}
-          {% endfor %}
-      </div>
-      <div class="text-sm text-gray-600 mb-4">
-          <span class="font-medium">Published:</span> {{ paper.publication_date|date:"Y" }}
-      </div>
-      <div class="text-sm text-gray-600 mb-4">
-          <span class="font-medium">Abstract:</span>
-          <p class="mt-2 text-gray-700">{{ paper.abstract }}</p>
-      </div>
 
-      <div class="grid grid-cols-3 gap-4 mb-6">
-          <div class="bg-gray-50 p-4 rounded-md">
-              <div class="text-sm text-gray-600">Citations</div>
-              <div class="text-2xl font-semibold">{{ paper.citations }}</div>
-          </div>
-          <div class="bg-gray-50 p-4 rounded-md">
-              <div class="text-sm text-gray-600">Publication Date</div>
-              <div class="text-2xl font-semibold">{{ paper.publication_date }}</div>
-          </div>
-          <div class="bg-gray-50 p-4 rounded-md">
-              <div class="text-sm text-gray-600">Available Copies</div>
-              <div class="text-2xl font-semibold">{{ paper.available_copies }}</div>
-          </div>
-      </div>
-    {% if user.is_authenticated %}
+<div class="bg-white rounded-lg shadow-sm p-6 max-w-5xl mx-auto">
+    <h1 class="text-3xl font-extrabold text-gray-900 mb-4">{{ paper.title }}</h1>
+
+    <div class="text-sm text-gray-600 mb-4">
+        <span class="font-medium">Authors:</span>
+        {% for author in paper.authors.all %}
+            {% if not forloop.first %}, {% endif %}
+            {{ author.name }}
+        {% endfor %}
+    </div>
+    <div class="text-sm text-gray-600 mb-4">
+        <span class="font-medium">Published:</span> {{ paper.publication_date|date:"Y" }}
+    </div>
+
+    <div class="text-sm text-gray-600 mb-4">
+        <span class="font-medium">Abstract:</span>
+        <p class="mt-2 text-gray-700 no-copy">{{ paper.abstract }}</p>
+    </div>
+
+    <!-- PDF Viewer Section -->
+    {% if paper.pdf_file.name %}
+    <div class="pdf-container">
+        <div id="pdf-pages"></div>
+    </div>
+    <!-- Include PDF.js Library and the script for rendering pages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+            const pdfUrl = "{{ paper.pdf_file.url }}";
+            let pdfDoc = null;
+            const pdfContainer = document.getElementById("pdf-pages");
+            pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
+                pdfDoc = pdf;
+                for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
+                    renderPage(pageNum);
+                }
+            }).catch(error => {
+                console.error("Error loading PDF:", error);
+            });
+            function renderPage(num) {
+                pdfDoc.getPage(num).then(page => {
+                    let viewport = page.getViewport({ scale: 1.5 });
+                    let canvas = document.createElement("canvas");
+                    canvas.classList.add("mb-4", "shadow-md", "rounded-lg");
+                    pdfContainer.appendChild(canvas);
+                    let context = canvas.getContext("2d");
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    let renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            }
+        });
+    </script>
+    {% else %}
+        <div class="bg-gray-100 text-gray-700 p-6 rounded-md shadow-md text-center">
+            <p class="text-lg font-semibold">No PDF file available for this paper.</p>
+            <svg class="mx-auto mt-2 w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9.75 9.75h4.5m-4.5 3h6m-6 3h6m-9 4.5h12A1.5 1.5 0 0021 18V6a1.5 1.5 0 00-1.5-1.5H4.5A1.5 1.5 0 003 6v12a1.5 1.5 0 001.5 1.5z" />
+            </svg>
+        </div>
+    {% endif %}
+
+    <!-- Borrowing Section -->
+    {% comment %} {% if user.is_authenticated %}
         {% if paper.id in user_borrowed_papers %}
             <button disabled class="bg-gray-400 text-white px-6 py-2 rounded-md cursor-not-allowed">
                 Already Borrowed
@@ -66,17 +143,9 @@
         {% endif %}
     {% else %}
         <a href="{% url 'login' %}" 
-       class="inline-block bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+           class="inline-block bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
             Login to Borrow
         </a>
-    {% endif %}
-    {% comment %} {% if paper.pdf_file %}
-        <a href="{{ paper.pdf_file.url }}" 
-           class="inline-block mt-4 bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
-            Download PDF
-        </a>
     {% endif %} {% endcomment %}
-
-
 </div>
 {% endblock %}

@@ -22,7 +22,7 @@ class BorrowInline(admin.TabularInline):
 
 @admin.register(Paper)
 class PaperAdmin(admin.ModelAdmin):
-    list_display = ('title', 'publication_date', 'citations', 'available_copies', 'pdf_link', 'borrowing_status')
+    list_display = ('title', 'publication_date', 'pdf_file', 'citations', 'available_copies', 'pdf_link', 'borrowing_status')
     list_filter = ('publication_date', 'available_copies', 'authors')
     search_fields = ('title', 'authors__name', 'abstract')
     filter_horizontal = ('authors',)
@@ -30,7 +30,6 @@ class PaperAdmin(admin.ModelAdmin):
     inlines = [BorrowInline]
     date_hierarchy = 'publication_date'
     actions = ['increment_copies', 'decrement_copies']
-
     def pdf_link(self, obj):
         if obj.pdf_file:
             return format_html('<a href="{}" target="_blank">View PDF</a>', obj.pdf_file.url)

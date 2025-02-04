@@ -55,8 +55,9 @@ class Paper(models.Model):
     publication_date = models.DateField()
     citations = models.PositiveIntegerField(default=0)
     available_copies = models.PositiveIntegerField(default=1)
-    view_count = models.PositiveIntegerField(default=0)  # Total views
-    viewers = models.ManyToManyField(User, related_name='viewed_papers', blank=True)  # Track unique viewers
+    view_count = models.PositiveIntegerField(default=0)
+    viewers = models.ManyToManyField(User, related_name='viewed_papers', blank=True)
+    pdf_file = models.FileField(upload_to='papers/', blank=True, null=True)  # Add this field
 
     def __str__(self):
         return self.title

@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from datetime import timedelta, datetime
 from django.utils import timezone
 from .forms import ReservationForm
-
+from django.views.decorators.clickjacking import xframe_options_exempt
 # Create your views here.
 from django.contrib.sessions.models import Session
 from django.utils import timezone
@@ -62,8 +62,11 @@ def home(request):
           'user_bookmarked_papers': user_bookmarked_papers,
           'active_viewers': active_viewers,  # Pass the number of active viewers to the template
       })
+
+@xframe_options_exempt
 def paper_detail(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)
+    print(f"PDF File: {paper.pdf_file}")  # Debug statement
     session_key = f'viewed_paper_{paper_id}'
 
     if not request.session.get(session_key, False):

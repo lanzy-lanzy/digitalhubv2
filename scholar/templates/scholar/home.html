@@ -10,6 +10,20 @@
         -moz-user-select: none;
         -ms-user-select: none;
     }
+    .pagination a, .pagination span {
+        margin: 0 0.25rem;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #ccc;
+        text-decoration: none;
+        color: #333;
+    }
+    .pagination a:hover {
+        background-color: #f0f0f0;
+    }
+    .pagination .current {
+        font-weight: bold;
+        background-color: #e2e8f0;
+    }
 </style>
 
 <div class="max-w-4xl mx-auto">
@@ -19,7 +33,7 @@
                 <div class="flex-1 relative">
                     <input type="text" name="q" value="{{ query }}" 
                            class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="Search articles, authors...">
+                           placeholder="Search articles, authors, years, and more..." />
                     <svg class="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
@@ -32,14 +46,28 @@
         </form>
     </div>
 
-    
     {% if query %}
         <div class="text-sm text-gray-600 mb-4">
             Showing results for: <span class="font-medium">{{ query }}</span>
         </div>
     {% endif %}
 
-    <div class="space-y-8">
+    {% with authors=paper.authors.all %}
+        {% with total_authors=authors|length %}
+    <div class="font-medium">
+        {% for author in authors|slice:":3" %}
+            {% if not forloop.first %}, {% endif %}
+            {{ author.name }}
+            {% if author.userprofile.student %}
+                <span class="text-gray-500">({{ author.userprofile.student.program }})</span>
+            {% endif %}
+        {% endfor %}
+        {% if total_authors > 3 %}
+            , …
+        {% endif %}
+    </div>
+        {% endwith %}
+    {% endwith %}    <div class="space-y-8">
         {% for paper in papers %}
             <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
                 <!-- Paper Header -->
@@ -73,7 +101,13 @@
                                     <span>{{ paper.citations }} citations</span>
                                 {% endif %}
                                 <span class="text-gray-400">•</span>
-                                <span class="flex items-center"><svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>{{ paper.view_count }} views</span>
+                                <span class="flex items-center">
+                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    {{ paper.view_count }} views
+                                </span>
                                 <span class="text-gray-400">•</span>
                             </div>
                         </div>
@@ -95,30 +129,14 @@
                 <div class="p-6">
                     <!-- Abstract -->
                     <div class="mb-4">
-                        <div class="mb-4">
-                            <h3 class="text-sm font-semibold text-gray-900 mb-2">Abstract</h3>
-                            <p class="text-gray-700 text-sm leading-relaxed no-copy">{{ paper.abstract }}</p>
-                        </div>
-
-                        <!-- Introduction Preview -->
-                        {% if paper.introduction %}
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-900 mb-2">Introduction</h3>
-                                <div class="relative">
-                                    <div class="text-gray-700 text-sm leading-relaxed no-copy">
-                                        {{ paper.introduction }}
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
+                        <h3 class="text-sm font-semibold text-gray-900 mb-2">Abstract</h3>
+                        <p class="text-gray-700 text-sm leading-relaxed no-copy">{{ paper.abstract }}</p>
                     </div>
-                <!-- Paper Footer -->
-                <div class="px-6 py-4 bg-gray-50 rounded-b-lg border-t border-gray-100">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            {% if user.is_authenticated %}
-                                <!-- Show borrow/reserve options for authenticated users -->
-                                {% if paper.available_copies > 0 %}
+                    <!-- Paper Footer -->
+                    <div class="px-6 py-4 bg-gray-50 rounded-b-lg border-t border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                {% if user.is_authenticated %}
                                     {% if paper.id in user_borrowed_papers %}
                                         <span class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 cursor-not-allowed">
                                             Already Borrowed
@@ -133,62 +151,50 @@
                                         </form>
                                     {% endif %}
                                 {% else %}
-                                    {% for borrow in borrowed_by_others %}
-                                        {% if borrow.paper.id == paper.id %}
-                                            {% comment %} <form action="{% url 'reserve_paper' paper.id %}" method="post">
-                                                {% csrf_token %}
-                                                <input type="date" name="reserved_date" min="{{ borrow.due_date|date:'Y-m-d' }}" required>
-                                                <button type="submit" 
-                                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
-                                                    Reserve Paper
-                                                </button>
-                                            </form> {% endcomment %}
-                                        {% endif %}
-                                    {% endfor %}
+                                    <a href="{% url 'login' %}"
+                                       class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        Continue Reading . . .
+                                    </a>
                                 {% endif %}
-                            {% else %}
-                                <!-- Show login prompt for anonymous users -->
-                                <a href="{% url 'login' %}"
-                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    Continue Reading
-                                </a>
-                            {% endif %}
-                            <!-- Add View Details Button -->
-                            <a href="{% url 'paper_detail' paper.id %}"
-                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
-                                </svg>
-                                View Details
-                            </a>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            {% if user.is_authenticated %}
-                                {% if paper.id in user_bookmarked_papers %}
-                                    <form action="{% url 'unbookmark_paper' paper.id %}" method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" 
-                                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'paper_detail' paper.id %}"
+                                        class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                                        </svg>
+                                        View Details
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                {% if user.is_authenticated %}
+                                    {% if paper.id in user_bookmarked_papers %}
+                                        <form action="{% url 'unbookmark_paper' paper.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                                             Unbookmark
-                                        </button>
-                                    </form>
-                                {% else %}
-                                    <form action="{% url 'bookmark_paper' paper.id %}" method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" 
-                                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form action="{% url 'bookmark_paper' paper.id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" 
+                                                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                                             Bookmark
-                                        </button>
-                                    </form>
+                                            </button>
+                                        </form>
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
-                        </div>
-                        <div class="text-sm text-gray-500">
-                            Published {{ paper.publication_date|date:"M d, Y" }}
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                Published {{ paper.publication_date|date:"M d, Y" }}
+                            </div>
                         </div>
                     </div>
-                </div>            </div>
+                </div>
+            </div>
         {% empty %}
             <div class="bg-white rounded-lg p-8 text-center shadow-sm">
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,14 +203,24 @@
                 <h3 class="mt-4 text-lg font-medium text-gray-900">No results found</h3>
                 <p class="mt-2 text-gray-500">Try adjusting your search terms or filters</p>
             </div>
-        {% endfor %}    </div>
-</div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination mt-8 flex justify-center items-center space-x-4">
+        {% if papers.has_previous %}
+            <a href="?page={{ papers.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition duration-150 ease-in-out">Previous</a>
+        {% endif %}
+        <span class="current px-4 py-2 bg-gray-100 rounded-md text-gray-700 font-medium">Page {{ papers.number }} of {{ papers.paginator.num_pages }}</span>
+        {% if papers.has_next %}
+            <a href="?page={{ papers.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition duration-150 ease-in-out">Next</a>
+        {% endif %}
+    </div></div>
 
 <script>
     document.addEventListener('contextmenu', function(event) {
         event.preventDefault();
     });
-
     document.addEventListener('keydown', function(event) {
         if (event.ctrlKey && (event.key === 'c' || event.key === 'x' || event.key === 'a')) {
             event.preventDefault();
@@ -212,5 +228,3 @@
     });
 </script>
 {% endblock %}
-
-

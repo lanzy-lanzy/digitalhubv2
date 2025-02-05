@@ -16,53 +16,37 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 # Create your views here.
 from django.contrib.sessions.models import Session
 from django.utils import timezone
+from django.core.paginator import Paginator
+from django.db.models import Q
+from scholar.models import Paper, Borrow
 
 def home(request):
       query = request.GET.get('q', '')
       papers = Paper.objects.all()
-
       if query:
-          papers = papers.filter(
-              Q(title__icontains=query) |
-              Q(authors__name__icontains=query) |
-              Q(abstract__icontains=query)
-          ).distinct()
+          filters = Q(title__icontains=query) | Q(abstract__icontains=query) | Q(authors__name__icontains=query)
+          if query.isdigit():
+              filters |= Q(publication_date__year=int(query))
+          papers = papers.filter(filters).distinct()
 
-      user_borrowed_papers = []
-      user_bookmarked_papers = []
+      # Apply pagination; 10 papers per page (adjust as needed)
+      paginator = Paginator(papers, 10)
+      page_number = request.GET.get('page')
+      papers_page = paginator.get_page(page_number)
 
       if request.user.is_authenticated:
-          user_borrowed_papers = Borrow.objects.filter(
-              user=request.user,
-              status='approved',
-              is_returned=False
-          ).values_list('paper_id', flat=True)
+          user_borrowed_papers = list(
+              Borrow.objects.filter(user=request.user).values_list('paper__id', flat=True)
+          )
+      else:
+          user_borrowed_papers = []
 
-          user_bookmarked_papers = Bookmark.objects.filter(
-              user=request.user
-          ).values_list('paper_id', flat=True)
-
-      borrowed_by_others = Borrow.objects.filter(
-          status='approved',
-          is_returned=False
-      ).exclude(user=request.user).select_related('paper') if request.user.is_authenticated else Borrow.objects.filter(
-          status='approved',
-          is_returned=False
-      ).select_related('paper')
-
-      # Track active viewers
-      active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
-      active_viewers = len(active_sessions)
-
-      return render(request, 'scholar/home.html', {
-          'papers': papers,
+      context = {
           'query': query,
+          'papers': papers_page,
           'user_borrowed_papers': user_borrowed_papers,
-          'borrowed_by_others': borrowed_by_others,
-          'user_bookmarked_papers': user_bookmarked_papers,
-          'active_viewers': active_viewers,  # Pass the number of active viewers to the template
-      })
-
+      }
+      return render(request, 'scholar/home.html', context)
 @xframe_options_exempt
 def paper_detail(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)

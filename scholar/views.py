@@ -174,31 +174,26 @@ def request_return(request, borrow_id):
         messages.warning(request, 'You cannot request to return this item.')
 
     return redirect('my_borrowed_papers')
-
 @staff_member_required
 def approve_return(request, borrow_id):
-    """
-    Allows an admin to approve a return request.
-    """
-    borrow = get_object_or_404(Borrow, id=borrow_id)
+      borrow = get_object_or_404(Borrow, id=borrow_id)
+      if borrow.return_status == 'pending':
+          borrow.return_status = 'approved'
+          borrow.is_returned = True
+          borrow.return_date = timezone.now()
+          borrow.save()
 
-    if borrow.return_status == 'pending':
-        borrow.return_status = 'approved'
-        borrow.is_returned = True
-        borrow.return_date = timezone.now()
-        borrow.save()
+          # Increment available copies of the paper
+          paper = borrow.paper
+          paper.available_copies += 1
+          paper.save()
+          messages.success(request, 'Return request approved.')
 
-        # Increment available copies of the paper
-        paper = borrow.paper
-        paper.available_copies += 1
-        paper.save()
-
-        messages.success(request, 'Return request approved.')
-    else:
-        messages.warning(request, 'Return request is not pending.')
-
-    return redirect('admin_return_requests')
-
+          if request.headers.get("HX-Request"):
+              return render(request, "scholar/admin/partials/available_copies.html", {"paper": paper})
+      else:
+          messages.warning(request, 'Return request is not pending.')
+      return redirect('admin_return_requests')
 
 @staff_member_required
 def reject_return(request, borrow_id):

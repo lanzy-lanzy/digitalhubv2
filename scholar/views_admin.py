@@ -107,22 +107,23 @@ from .models import Borrow, Paper
 from django.utils import timezone
 @staff_member_required
 def mark_returned(request, borrow_id):
-    borrow = get_object_or_404(Borrow, id=borrow_id, user=request.user)
-    if request.method == 'POST' and borrow.status == 'approved' and not borrow.is_returned and borrow.return_status == 'pending':
+    borrow = get_object_or_404(Borrow, id=borrow_id)
+    if borrow.status == 'approved' and not borrow.is_returned:
         borrow.is_returned = True
         borrow.return_date = timezone.now()
-        borrow.return_status = None  # reset the return request status
         borrow.save()
 
-        # Make the returned paper available again
+        # Increment available copies of the paper.
         paper = borrow.paper
         paper.available_copies += 1
         paper.save()
 
-        messages.success(request, 'Paper has been marked as returned and is now available.')
+        messages.success(request, 'Borrow marked as returned and available copies updated.')
+        # If using HTMX, you might return a partial snippet here.
+        return redirect('admin_borrow_requests')
     else:
-        messages.error(request, 'This paper cannot be marked as returned.')
-    return redirect('my_borrowed_papers')
+        messages.warning(request, 'Cannot mark this borrow as returned.')
+        return redirect('admin_borrow_requests')
 
 
 @staff_member_required

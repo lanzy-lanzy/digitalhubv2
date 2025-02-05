@@ -94,30 +94,50 @@
                         </div>
                     </div>
                       <!-- Academic Information Section -->
-                      <div class="border-b border-gray-200 pb-4">
-                          <h3 class="text-xl font-semibold text-gray-900 mb-6">Academic Information</h3>
+                      <div class="border-b border-gray-300 pb-6 bg-white shadow-md rounded-lg p-6">
+                          <h3 class="text-xl font-semibold text-gray-800 mb-6">Academic Information</h3>
                           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div class="relative">
-                                  <input id="id_student_id" name="student_id" type="text" required
-                                       class="peer block w-full px-4 py-3 border rounded-lg shadow-sm"
-                                       placeholder="Student ID">
-                                  <label for="id_student_id" class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600">
+                                  <input
+                                      id="id_student_id"
+                                      name="student_id"
+                                      type="text"
+                                      required
+                                      class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                                      placeholder="Student ID"
+                                  />
+                                  <label for="id_student_id"
+                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                                peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                                                peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
                                       Student ID
                                   </label>
                               </div>
 
                               <div class="relative">
-                                  <input id="id_program" name="program" type="text" required
-                                       class="peer block w-full px-4 py-3 border rounded-lg shadow-sm"
-                                       placeholder="Program">
-                                  <label for="id_program" class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600">
+                                  <input
+                                      id="id_program"
+                                      name="program"
+                                      type="text"
+                                      required
+                                      class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                                      placeholder="Program"
+                                  />
+                                  <label for="id_program"
+                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
+                                                peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                                                peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
                                       Program
                                   </label>
                               </div>
 
                               <div class="relative">
-                                  <select id="id_year_level" name="year_level" required
-                                          class="peer block w-full px-4 py-3 border rounded-lg shadow-sm">
+                                  <select
+                                      id="id_year_level"
+                                      name="year_level"
+                                      required
+                                      class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                                  >
                                       <option value="">Select Year Level</option>
                                       <option value="1">1st Year</option>
                                       <option value="2">2nd Year</option>
@@ -125,7 +145,10 @@
                                       <option value="4">4th Year</option>
                                       <option value="5">5th Year</option>
                                   </select>
-                                  <label for="id_year_level" class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600">
+                                  <label for="id_year_level"
+                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-700 transition-all
+                                                peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                                                peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
                                       Year Level
                                   </label>
                               </div>
@@ -199,6 +222,5 @@
                 </div>
             </form>
         </div>
-    </div>
-</div>
+    </div></div>
 {% endblock %}

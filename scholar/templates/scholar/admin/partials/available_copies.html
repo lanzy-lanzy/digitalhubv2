@@ -1,0 +1,3 @@
+<div id="available-copies-{{ paper.id }}" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if paper.available_copies > 0 %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+    {{ paper.available_copies }} copies
+</div>

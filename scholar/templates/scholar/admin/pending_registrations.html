@@ -18,6 +18,15 @@
                         Phone
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Student ID
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Program
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Year Level
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
                     </th>
                 </tr>
@@ -34,6 +43,33 @@
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm text-gray-900">{{ user_profile.phone }}</div>
                     </td>
+                    {% if user_profile.user.student %}
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ user_profile.user.student.student_id }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ user_profile.user.student.program }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">
+                            {% for value, label in user_profile.user.student.YEAR_CHOICES %}
+                                {% if user_profile.user.student.year_level|stringformat:"s" == value|stringformat:"s" %}
+                                    {{ label }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </td>
+                    {% else %}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">N/A</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">N/A</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">N/A</div>
+                        </td>
+                    {% endif %}
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <a href="{% url 'approve_registration' user_profile.user.id %}" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
                             Approve

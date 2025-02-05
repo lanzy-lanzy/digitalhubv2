@@ -36,7 +36,8 @@ def home(request):
 
       if request.user.is_authenticated:
           user_borrowed_papers = list(
-              Borrow.objects.filter(user=request.user).values_list('paper__id', flat=True)
+
+              Borrow.objects.filter(user=request.user, status__in=['pending', 'approved']).values_list('paper__id', flat=True)
           )
       else:
           user_borrowed_papers = []
@@ -98,7 +99,7 @@ def borrow_paper(request, paper_id):
 
     if paper.id not in active_paper_ids and active_paper_ids.count() >= 2:
         messages.error(request, 'You cannot borrow more than 2 different papers at a time.')
-        return redirect('paper_detail', paper_id=paper_id)
+        return redirect('home')
 
     existing_borrow = active_borrows.filter(paper=paper).first()
 
@@ -118,7 +119,7 @@ def borrow_paper(request, paper_id):
     else:
         messages.warning(request, 'You already have a borrow request for this paper!')
 
-    return redirect('paper_detail', paper_id=paper_id)
+    return redirect('home')
 
 
 
@@ -198,6 +199,7 @@ def approve_return(request, borrow_id):
 
     return redirect('admin_return_requests')
 
+
 @staff_member_required
 def reject_return(request, borrow_id):
     """
@@ -243,21 +245,11 @@ class RegisterView(CreateView):
     def form_valid(self, form):
         try:
             with transaction.atomic():
-                # Create and save the user, but do not commit immediately
-                user = form.save(commit=False)
-                user.is_active = False  # Deactivate until admin approval
+                # Call form.save() directly so that the Student record creation in the form is executed.
+                user = form.save()  
+                # Deactivate the user until admin approval.
+                user.is_active = False  
                 user.save()
-                
-                # Create UserProfile if one doesn't exist
-                profile, created = UserProfile.objects.get_or_create(
-                    user=user,
-                    defaults={
-                        'phone': form.cleaned_data['phone'],
-                        'address': form.cleaned_data['address'],
-                        'is_approved': False,
-                    }
-                )
-
                 messages.success(self.request, 'Registration successful! Awaiting admin approval.')
                 return redirect(self.success_url)
         except Exception as e:
@@ -279,7 +271,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 @staff_member_required
 def admin_pending_registrations(request):
-    pending_users = UserProfile.objects.filter(is_approved=False)
+    pending_users = UserProfile.objects.filter(is_approved=False).select_related('user', 'user__student')
     return render(request, 'scholar/admin/pending_registrations.html', {'pending_users': pending_users})
 
 @staff_member_required

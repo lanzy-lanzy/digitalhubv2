@@ -105,26 +105,25 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib import messages
 from .models import Borrow, Paper
 from django.utils import timezone
-
 @staff_member_required
 def mark_returned(request, borrow_id):
-  borrow = get_object_or_404(Borrow, id=borrow_id)
-    
-  if borrow.status == 'approved' and not borrow.is_returned:
-      borrow.is_returned = True
-      borrow.return_date = timezone.now()
-      borrow.save()
-        
-      # Increment available copies of the paper
-      paper = borrow.paper
-      paper.available_copies += 1
-      paper.save()
-        
-      messages.success(request, 'Paper marked as returned.')
-  else:
-      messages.warning(request, 'Paper cannot be marked as returned.')
-    
-  return redirect('manage_borrows')
+    borrow = get_object_or_404(Borrow, id=borrow_id, user=request.user)
+    if request.method == 'POST' and borrow.status == 'approved' and not borrow.is_returned and borrow.return_status == 'pending':
+        borrow.is_returned = True
+        borrow.return_date = timezone.now()
+        borrow.return_status = None  # reset the return request status
+        borrow.save()
+
+        # Make the returned paper available again
+        paper = borrow.paper
+        paper.available_copies += 1
+        paper.save()
+
+        messages.success(request, 'Paper has been marked as returned and is now available.')
+    else:
+        messages.error(request, 'This paper cannot be marked as returned.')
+    return redirect('my_borrowed_papers')
+
 
 @staff_member_required
 def paper_analytics(request, paper_id):

@@ -74,15 +74,15 @@ class StudentRegistrationForm(UserCreationForm):
         user.email = self.cleaned_data['email']
         
         if commit:
-            user.save()  # This triggers the signal to create UserProfile
+            user.save()  # Save the user so that the related UserProfile signal creates the profile.
             
-            # Update the auto-created UserProfile
+            # Update the auto-created UserProfile with additional information
             user_profile = user.userprofile
             user_profile.phone = self.cleaned_data['phone']
             user_profile.address = self.cleaned_data['address']
             user_profile.save()
             
-            # Create Student record
+            # Create the Student record using the extra fields
             Student.objects.create(
                 user=user,
                 student_id=self.cleaned_data['student_id'],
@@ -90,7 +90,6 @@ class StudentRegistrationForm(UserCreationForm):
                 year_level=self.cleaned_data['year_level']
             )
         return user
-
 from django import forms
 from django.contrib.auth.models import User
 

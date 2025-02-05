@@ -108,13 +108,22 @@
                                         {% endif %}
                                     </td>
                                 </tr>
-                            {% endfor %}                        </tbody>
+                            {% endfor %}
+                           {% if borrow.status == 'approved' and not borrow.is_returned and borrow.return_status == 'pending' and borrow.user == request.user %}
+                                <form method="post" action="{% url 'mark_returned' borrow.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-blue-600 hover:text-blue-900 mr-3">
+                                        <i class="fas fa-check"></i> Mark Returned
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}
     <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">

@@ -21,33 +21,43 @@ from django.db.models import Q
 from scholar.models import Paper, Borrow
 
 def home(request):
-      query = request.GET.get('q', '')
-      papers = Paper.objects.all()
-      if query:
-          filters = Q(title__icontains=query) | Q(abstract__icontains=query) | Q(authors__name__icontains=query)
-          if query.isdigit():
-              filters |= Q(publication_date__year=int(query))
-          papers = papers.filter(filters).distinct()
+    query = request.GET.get('q', '')
+    program_filter = request.GET.get('program', '')  # Add program filter
+    papers = Paper.objects.all()
 
-      # Apply pagination; 10 papers per page (adjust as needed)
-      paginator = Paginator(papers, 10)
-      page_number = request.GET.get('page')
-      papers_page = paginator.get_page(page_number)
+    if query:
+        filters = Q(title__icontains=query) | Q(abstract__icontains=query) | Q(authors__name__icontains=query)
+        if query.isdigit():
+            filters |= Q(publication_date__year=int(query))
+        papers = papers.filter(filters).distinct()
 
-      if request.user.is_authenticated:
-          user_borrowed_papers = list(
+    # Apply program filter if selected
+    if program_filter:
+        papers = papers.filter(program=program_filter)
 
-              Borrow.objects.filter(user=request.user, status__in=['pending', 'approved']).values_list('paper__id', flat=True)
-          )
-      else:
-          user_borrowed_papers = []
+    # Apply pagination
+    paginator = Paginator(papers, 10)
+    page_number = request.GET.get('page')
+    papers_page = paginator.get_page(page_number)
 
-      context = {
-          'query': query,
-          'papers': papers_page,
-          'user_borrowed_papers': user_borrowed_papers,
-      }
-      return render(request, 'scholar/home.html', context)
+    if request.user.is_authenticated:
+        user_borrowed_papers = list(
+            Borrow.objects.filter(user=request.user, status__in=['pending', 'approved']).values_list('paper__id', flat=True)
+        )
+    else:
+        user_borrowed_papers = []
+
+    # Get all available programs for the filter dropdown
+    programs = dict(Student.PROGRAM_CHOICES)
+
+    context = {
+        'query': query,
+        'program_filter': program_filter,
+        'papers': papers_page,
+        'user_borrowed_papers': user_borrowed_papers,
+        'programs': programs,  # Add programs to context
+    }
+    return render(request, 'scholar/home.html', context)
 @xframe_options_exempt
 def paper_detail(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)
@@ -255,10 +265,18 @@ def admin_dashboard(request):
     if not request.user.is_staff:
         return redirect('home')
 
-    # Fetch data for the dashboard
+    # Get papers count by program
+    papers_by_program = Paper.objects.values('program').annotate(count=Count('id'))
+    program_dict = dict(Student.PROGRAM_CHOICES)
+    papers_by_program = [{
+        'program_name': program_dict.get(item['program'], item['program']),
+        'count': item['count']
+    } for item in papers_by_program]
+
     context = {
         'total_papers': Paper.objects.count(),
         'active_borrows': Borrow.objects.filter(status='approved', is_returned=False).count(),
+        'papers_by_program': papers_by_program,
     }
     return render(request, 'scholar/admin_dashboard.html', context)
 
@@ -456,3 +474,21 @@ from scholar.models import Borrow
 def view_borrow(request, borrow_id):
     borrow = get_object_or_404(Borrow, id=borrow_id)
     return render(request, 'scholar/view_borrow.html', {'borrow': borrow})
+
+@staff_member_required
+def paper_analytics(request, paper_id):
+    paper = get_object_or_404(Paper, id=paper_id)
+    borrow_history = Borrow.objects.filter(paper=paper).order_by('-borrow_date')
+    
+    # Get program name for display
+    program_dict = dict(Student.PROGRAM_CHOICES)
+    program_name = program_dict.get(paper.program, paper.program)
+    
+    context = {
+        'paper': paper,
+        'program_name': program_name,
+        'borrow_history': borrow_history,
+        'total_borrows': borrow_history.count(),
+        'active_borrows': borrow_history.filter(is_returned=False).count(),
+    }
+    return render(request, 'scholar/admin/paper_analytics.html', context)

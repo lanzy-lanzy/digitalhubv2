@@ -78,7 +78,12 @@ class Paper(models.Model):
     available_copies = models.PositiveIntegerField(default=1)
     view_count = models.PositiveIntegerField(default=0)
     viewers = models.ManyToManyField(User, related_name='viewed_papers', blank=True)
-    pdf_file = models.FileField(upload_to='papers/', blank=True, null=True)  # Add this field
+    pdf_file = models.FileField(upload_to='papers/', blank=True, null=True)
+    program = models.CharField(
+        max_length=100, 
+        choices=Student.PROGRAM_CHOICES,
+        default='BSIT'  # Setting default value to BSIT
+    )
 
     def __str__(self):
         return self.title

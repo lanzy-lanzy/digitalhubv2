@@ -14,11 +14,12 @@ class PaperUploadForm(forms.ModelForm):
 
     class Meta:
         model = Paper
-        fields = ['title', 'abstract', 'publication_date', 'pdf_file']
+        fields = ['title', 'abstract', 'publication_date', 'pdf_file', 'program', 'authors']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'}),
             'abstract': forms.Textarea(attrs={'rows': 4, 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'}),
             'publication_date': forms.DateInput(attrs={'type': 'date', 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'}),
+            'program': forms.Select(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'})
         }
 
     def clean_authors(self):

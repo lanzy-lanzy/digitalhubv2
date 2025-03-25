@@ -21,9 +21,30 @@ class Student(models.Model):
         (5, '5th Year'),
     ]
 
+    PROGRAM_CHOICES = [
+        # School of Agriculture, Forestry and Environmental Studies
+        ('MAgDev-AE', 'Master of Agricultural Development - Agricultural Extension'),
+        ('BSA-CS', 'Bachelor of Science in Agriculture - Crop Science'),
+        ('BSA-AS', 'Bachelor of Science in Agriculture - Animal Science'),
+        
+        # School of Teacher Education
+        ('MAEd-EA', 'Master of Arts in Education - Educational Administration'),
+        ('BEEd', 'Bachelor of Elementary Education'),
+        ('BPEd', 'Bachelor of Physical Education'),
+        ('BSEd-ENG', 'Bachelor of Secondary Education - English'),
+        ('BSEd-MATH', 'Bachelor of Secondary Education - Mathematics'),
+        
+        # School of Engineering and Technology
+        ('BSIT', 'Bachelor of Science in Information Technology'),
+        
+        # School of Criminal Justice Education
+        ('BSCrim', 'Bachelor of Science in Criminology'),
+        ('BSISM', 'Bachelor of Science in Industrial Security Management'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     student_id = models.CharField(max_length=50, unique=True)
-    program = models.CharField(max_length=100)
+    program = models.CharField(max_length=100, choices=PROGRAM_CHOICES)
     year_level = models.IntegerField(choices=YEAR_CHOICES)
 
     def __str__(self):

@@ -94,49 +94,54 @@
                         </div>
                     </div>
                       <!-- Academic Information Section -->
-                      <div class="border-b border-gray-300 pb-6 bg-white shadow-md rounded-lg p-6">
-                          <h3 class="text-xl font-semibold text-gray-800 mb-6">Academic Information</h3>
-                          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                              <div class="relative">
+                      <div class="border-b border-emerald-100 pb-6 bg-white shadow-xl rounded-xl p-6 space-y-6">
+                          <!-- Section Header -->
+                          <div class="flex items-center space-x-4 mb-8">
+                              <div class="p-3 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-lg shadow-md">
+                                  <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v7"/>
+                                  </svg>
+                              </div>
+                              <h3 class="text-xl font-semibold text-gray-800">Academic Information</h3>
+                          </div>
+
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                              <!-- Student ID Field -->
+                              <div class="relative group">
                                   <input
                                       id="id_student_id"
                                       name="student_id"
                                       type="text"
                                       required
-                                      class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                                      class="peer block w-full px-4 py-3 border-2 border-emerald-100 rounded-xl shadow-sm placeholder-transparent 
+                                             focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+                                             text-gray-800 bg-emerald-50/30 group-hover:bg-emerald-50/50 transition-all duration-200"
                                       placeholder="Student ID"
                                   />
                                   <label for="id_student_id"
-                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
-                                                peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
-                                                peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all
+                                                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                                                    peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
                                       Student ID
                                   </label>
+                                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                      <svg class="h-5 w-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"/>
+                                      </svg>
+                                  </div>
                               </div>
 
-                              <div class="relative">
-                                  <input
-                                      id="id_program"
-                                      name="program"
-                                      type="text"
-                                      required
-                                      class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"
-                                      placeholder="Program"
-                                  />
-                                  <label for="id_program"
-                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-600 transition-all
-                                                peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
-                                                peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
-                                      Program
-                                  </label>
-                              </div>
-
-                              <div class="relative">
+                              <!-- Year Level Field -->
+                              <div class="relative group">
                                   <select
                                       id="id_year_level"
                                       name="year_level"
                                       required
-                                      class="peer block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-transparent focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                                      class="peer block w-full px-4 py-3 border-2 border-emerald-100 rounded-xl shadow-sm 
+                                             focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+                                             text-gray-800 bg-emerald-50/30 group-hover:bg-emerald-50/50 transition-all duration-200 appearance-none"
                                   >
                                       <option value="">Select Year Level</option>
                                       <option value="1">1st Year</option>
@@ -146,12 +151,77 @@
                                       <option value="5">5th Year</option>
                                   </select>
                                   <label for="id_year_level"
-                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm text-gray-700 transition-all
-                                                peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
-                                                peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all
+                                                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                                                    peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
                                       Year Level
                                   </label>
+                                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                      <svg class="h-5 w-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                      </svg>
+                                  </div>
                               </div>
+
+                              <!-- Program Field - Full Width -->
+                              <div class="relative col-span-full group">
+                                  <select
+                                      id="id_program"
+                                      name="program"
+                                      required
+                                      class="peer block w-full px-4 py-3 border-2 border-emerald-100 rounded-xl shadow-sm 
+                                             focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 
+                                             text-gray-800 bg-emerald-50/30 group-hover:bg-emerald-50/50 transition-all duration-200 appearance-none"
+                                  >
+                                      <option value="">Select Your Program</option>
+                                      
+                                      <!-- School Groups -->
+                                      <optgroup label="School of Agriculture, Forestry and Environmental Studies" class="font-semibold text-emerald-800">
+                                          <option value="MAgDev-AE">Master of Agricultural Development - Agricultural Extension</option>
+                                          <option value="BSA-CS">Bachelor of Science in Agriculture - Crop Science</option>
+                                          <option value="BSA-AS">Bachelor of Science in Agriculture - Animal Science</option>
+                                      </optgroup>
+                                      
+                                      <optgroup label="School of Teacher Education" class="font-semibold text-emerald-800">
+                                          <option value="MAEd-EA">Master of Arts in Education - Educational Administration</option>
+                                          <option value="BEEd">Bachelor of Elementary Education</option>
+                                          <option value="BPEd">Bachelor of Physical Education</option>
+                                          <option value="BSEd-ENG">Bachelor of Secondary Education - English</option>
+                                          <option value="BSEd-MATH">Bachelor of Secondary Education - Mathematics</option>
+                                      </optgroup>
+                                      
+                                      <optgroup label="School of Engineering and Technology" class="font-semibold text-emerald-800">
+                                          <option value="BSIT">Bachelor of Science in Information Technology</option>
+                                      </optgroup>
+                                      
+                                      <optgroup label="School of Criminal Justice Education" class="font-semibold text-emerald-800">
+                                          <option value="BSCrim">Bachelor of Science in Criminology</option>
+                                          <option value="BSISM">Bachelor of Science in Industrial Security Management</option>
+                                      </optgroup>
+                                  </select>
+                                  <label for="id_program"
+                                         class="absolute left-4 -top-2.5 bg-white px-2 text-sm font-medium text-gray-600 transition-all
+                                                    peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                                                    peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-emerald-600">
+                                      Program
+                                  </label>
+                                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                      <svg class="h-5 w-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                      </svg>
+                                  </div>
+                              </div>
+                          </div>
+
+                          <!-- Additional Information Note -->
+                          <div class="mt-4 text-sm text-emerald-700 bg-emerald-50 rounded-lg p-4 border border-emerald-100">
+                              <div class="flex items-center space-x-2">
+                                  <svg class="h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                  </svg>
+                                  <span class="font-medium text-emerald-800">Important:</span>
+                              </div>
+                              <p class="mt-1 ml-7">Please ensure your academic information matches your school records exactly.</p>
                           </div>
                       </div>
                     <!-- Account Credentials Section -->

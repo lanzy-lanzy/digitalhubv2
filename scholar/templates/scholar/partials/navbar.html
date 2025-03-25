@@ -63,7 +63,10 @@
                 </div>
                 <!-- Username and Dropdown Icon -->
                 <div class="flex items-center">
-                    <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900">{{ user.username|title }}</span>
+                    <div class="flex flex-col items-start">
+                        <span class="text-sm font-medium text-gray-900">{{ user.get_full_name|default:user.username|title }}</span>
+                        <span class="text-xs text-emerald-600 font-medium">{{ user.student.student_id }}</span>
+                    </div>
                     <svg class="w-5 h-5 ml-2 text-gray-400 group-hover:text-gray-600 transition-transform duration-200" 
                          :class="{ 'transform rotate-180': open }"
                          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -91,7 +94,8 @@
                         {{ user.username|make_list|first|upper }}
                     </div>
                     <div>
-                        <p class="text-sm font-medium text-gray-900">{{ user.username|title }}</p>
+                        <p class="text-sm font-medium text-gray-900">{{ user.get_full_name|default:user.username|title }}</p>
+                        <p class="text-xs text-emerald-600 font-medium">{{ user.student.student_id }}</p>
                         <p class="text-xs text-gray-500">{{ user.email }}</p>
                     </div>
                 </div>

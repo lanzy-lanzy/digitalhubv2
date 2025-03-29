@@ -35,12 +35,18 @@
                         <div class="text-sm text-gray-900">{{ borrow.borrow_date }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{% url 'approve_return' borrow.id %}" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
-                            Approve Return
-                        </a>
-                        <a href="{% url 'reject_return' borrow.id %}" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors ml-2">
-                            Reject Return
-                        </a>
+                        <form method="post" action="{% url 'approve_return' borrow.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
+                                Approve Return
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'reject_return' borrow.id %}" class="inline ml-2">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+                                Reject Return
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}

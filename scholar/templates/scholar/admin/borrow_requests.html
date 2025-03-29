@@ -15,7 +15,7 @@
                         Paper
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Request Date
+                        Request Details
                     </th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
@@ -27,20 +27,36 @@
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="text-sm font-medium text-gray-900">{{ borrow.user.username }}</div>
+                        <div class="text-xs text-gray-500">{{ borrow.user.email }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ borrow.paper.title }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ borrow.paper.title }}</div>
+                        <div class="text-xs text-gray-500">ID: {{ borrow.paper.id }}</div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ borrow.borrow_date }}</div>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900 mb-1"><span class="font-medium">Requested:</span> {{ borrow.request_date|date:"M d, Y" }}</div>
+                        <div class="text-sm text-gray-900 mb-1"><span class="font-medium">Borrow Date:</span> {{ borrow.borrow_date|date:"M d, Y" }}</div>
+                        <div class="text-sm text-gray-900 mb-1"><span class="font-medium">Due Date:</span> {{ borrow.due_date|date:"M d, Y" }}</div>
+                        {% if borrow.borrow_reason %}
+                        <div class="mt-2">
+                            <div class="text-sm font-medium text-gray-700">Reason:</div>
+                            <div class="text-sm text-gray-600 bg-gray-50 p-2 rounded mt-1">{{ borrow.borrow_reason }}</div>
+                        </div>
+                        {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{% url 'approve_borrow' borrow.id %}" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
-                            Approve
-                        </a>
-                        <a href="{% url 'reject_borrow' borrow.id %}" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors ml-2">
-                            Reject
-                        </a>
+                        <form method="post" action="{% url 'approve_borrow' borrow.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
+                                Approve
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'reject_borrow' borrow.id %}" class="inline ml-2">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+                                Reject
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}

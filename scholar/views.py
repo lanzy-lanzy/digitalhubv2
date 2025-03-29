@@ -11,52 +11,61 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
 from datetime import timedelta, datetime
 from django.utils import timezone
-from .forms import ReservationForm
+from .forms import ReservationForm, BorrowForm
 from django.views.decorators.clickjacking import xframe_options_exempt
 # Create your views here.
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 from scholar.models import Paper, Borrow
 
 def home(request):
     query = request.GET.get('q', '')
-    program_filter = request.GET.get('program', '')  # Add program filter
+    date_from = request.GET.get('date_from', '')
+    date_to = request.GET.get('date_to', '')
+    sort = request.GET.get('sort', 'newest')
+
     papers = Paper.objects.all()
 
+    # Search filtering
     if query:
         filters = Q(title__icontains=query) | Q(abstract__icontains=query) | Q(authors__name__icontains=query)
         if query.isdigit():
             filters |= Q(publication_date__year=int(query))
         papers = papers.filter(filters).distinct()
 
-    # Apply program filter if selected
-    if program_filter:
-        papers = papers.filter(program=program_filter)
+    # Date range filtering
+    if date_from:
+        papers = papers.filter(publication_date__gte=date_from)
+    if date_to:
+        papers = papers.filter(publication_date__lte=date_to)
 
-    # Apply pagination
+    # Sorting
+    if sort == 'newest':
+        papers = papers.order_by('-publication_date')
+    elif sort == 'oldest':
+        papers = papers.order_by('publication_date')
+    elif sort == 'title_asc':
+        papers = papers.order_by('title')
+    elif sort == 'title_desc':
+        papers = papers.order_by('-title')
+    elif sort == 'citations':
+        papers = papers.order_by('-citations')
+
+    # Pagination (your existing pagination code)
     paginator = Paginator(papers, 10)
-    page_number = request.GET.get('page')
-    papers_page = paginator.get_page(page_number)
-
-    if request.user.is_authenticated:
-        user_borrowed_papers = list(
-            Borrow.objects.filter(user=request.user, status__in=['pending', 'approved']).values_list('paper__id', flat=True)
-        )
-    else:
-        user_borrowed_papers = []
-
-    # Get all available programs for the filter dropdown
-    programs = dict(Student.PROGRAM_CHOICES)
+    page = request.GET.get('page')
+    papers = paginator.get_page(page)
 
     context = {
+        'papers': papers,
         'query': query,
-        'program_filter': program_filter,
-        'papers': papers_page,
-        'user_borrowed_papers': user_borrowed_papers,
-        'programs': programs,  # Add programs to context
+        'date_from': date_from,
+        'date_to': date_to,
+        'sort': sort,
     }
+
     return render(request, 'scholar/home.html', context)
 @xframe_options_exempt
 def paper_detail(request, paper_id):
@@ -90,16 +99,14 @@ def paper_detail(request, paper_id):
 
 @login_required
 def borrow_paper(request, paper_id):
-    if request.method != 'POST':
-        messages.error(request, 'Invalid request method.')
-        return redirect('paper_detail', paper_id=paper_id)
-
     paper = get_object_or_404(Paper, id=paper_id)
 
+    # Check if paper is available
     if paper.available_copies <= 0:
         messages.error(request, 'No copies available for borrowing!')
         return redirect('paper_detail', paper_id=paper_id)
 
+    # Check if user already has active borrows
     active_borrows = Borrow.objects.filter(
         user=request.user,
         status__in=['pending', 'approved'],
@@ -109,58 +116,57 @@ def borrow_paper(request, paper_id):
 
     if paper.id not in active_paper_ids and active_paper_ids.count() >= 2:
         messages.error(request, 'You cannot borrow more than 2 different papers at a time.')
-        return redirect('home')
+        return redirect('paper_detail', paper_id=paper_id)
 
+    # Check if user already has a borrow request for this paper
     existing_borrow = active_borrows.filter(paper=paper).first()
-
-    if not existing_borrow:
-        due_date = timezone.now() + timedelta(days=7)
-        Borrow.objects.create(
-            user=request.user,
-            paper=paper,
-            status='pending',
-            due_date=due_date
-        )
-        # Decrement available copies for this paper immediately upon borrow request submission.
-        paper.available_copies = paper.available_copies - 1
-        paper.save()
-
-        messages.success(request, f'Borrow request submitted. Please return the paper by {due_date:%Y-%m-%d}.')
-    else:
+    if existing_borrow:
         messages.warning(request, 'You already have a borrow request for this paper!')
+        return redirect('paper_detail', paper_id=paper_id)
 
-    return redirect('home')
+    if request.method == 'POST':
+        form = BorrowForm(request.POST)
+        if form.is_valid():
+            # Get the selected borrow date from the form
+            borrow_date = form.cleaned_data['borrow_date']
+            borrow_reason = form.cleaned_data['borrow_reason']
+
+            # Convert date to datetime for the database
+            borrow_datetime = timezone.make_aware(datetime.combine(borrow_date, datetime.min.time()))
+
+            # Set due date to 7 days after borrow date
+            due_date = borrow_datetime + timedelta(days=7)
+
+            # Create the borrow record
+            Borrow.objects.create(
+                user=request.user,
+                paper=paper,
+                status='pending',
+                borrow_date=borrow_datetime,
+                due_date=due_date,
+                borrow_reason=borrow_reason
+            )
+
+            # Decrement available copies
+            paper.available_copies = paper.available_copies - 1
+            paper.save()
+
+            messages.success(request, f'Borrow request submitted for {borrow_date}. If approved, please return the paper by {due_date.date()}.')
+            return redirect('my_borrowed_papers')
+    else:
+        # Initialize form with default values
+        form = BorrowForm()
+
+    return render(request, 'scholar/borrow_form.html', {
+        'form': form,
+        'paper': paper
+    })
 
 
 
 
 
-@staff_member_required
-def approve_borrow(request, borrow_id):
-      borrow = get_object_or_404(Borrow, id=borrow_id)
-    
-      if borrow.status == 'pending':
-          borrow.status = 'approved'
-          borrow.save()
-          messages.success(request, 'Borrow request approved.')
-      else:
-          messages.warning(request, 'Borrow request is not pending.')
-    
-      return redirect('admin_borrow_requests')
-
-@staff_member_required
-def reject_borrow(request, borrow_id):
-      borrow = get_object_or_404(Borrow, id=borrow_id)
-    
-      if borrow.status == 'pending':
-          borrow.status = 'rejected'
-          borrow.save()
-          messages.success(request, 'Borrow request rejected.')
-      else:
-          messages.warning(request, 'Borrow request is not pending.')
-    
-      return redirect('admin_borrow_requests')
-
+# These functions have been moved to views_admin.py
 @staff_member_required
 def admin_borrow_requests(request):
       borrow_requests = Borrow.objects.filter(status='pending').order_by('-borrow_date')
@@ -186,6 +192,9 @@ def request_return(request, borrow_id):
     return redirect('my_borrowed_papers')
 @staff_member_required
 def approve_return(request, borrow_id):
+      if request.method != 'POST':
+          return redirect('admin_return_requests')
+
       borrow = get_object_or_404(Borrow, id=borrow_id)
       if borrow.return_status == 'pending':
           borrow.return_status = 'approved'
@@ -210,6 +219,9 @@ def reject_return(request, borrow_id):
     """
     Allows an admin to reject a return request.
     """
+    if request.method != 'POST':
+        return redirect('admin_return_requests')
+
     borrow = get_object_or_404(Borrow, id=borrow_id)
 
     if borrow.return_status == 'pending':
@@ -251,9 +263,9 @@ class RegisterView(CreateView):
         try:
             with transaction.atomic():
                 # Call form.save() directly so that the Student record creation in the form is executed.
-                user = form.save()  
+                user = form.save()
                 # Deactivate the user until admin approval.
-                user.is_active = False  
+                user.is_active = False
                 user.save()
                 messages.success(self.request, 'Registration successful! Awaiting admin approval.')
                 return redirect(self.success_url)
@@ -479,11 +491,11 @@ def view_borrow(request, borrow_id):
 def paper_analytics(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)
     borrow_history = Borrow.objects.filter(paper=paper).order_by('-borrow_date')
-    
+
     # Get program name for display
     program_dict = dict(Student.PROGRAM_CHOICES)
     program_name = program_dict.get(paper.program, paper.program)
-    
+
     context = {
         'paper': paper,
         'program_name': program_name,

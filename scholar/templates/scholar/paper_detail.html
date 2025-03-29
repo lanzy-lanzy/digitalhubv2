@@ -116,36 +116,46 @@
         <div class="bg-gray-100 text-gray-700 p-6 rounded-md shadow-md text-center">
             <p class="text-lg font-semibold">No PDF file available for this paper.</p>
             <svg class="mx-auto mt-2 w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9.75 9.75h4.5m-4.5 3h6m-6 3h6m-9 4.5h12A1.5 1.5 0 0021 18V6a1.5 1.5 0 00-1.5-1.5H4.5A1.5 1.5 0 003 6v12a1.5 1.5 0 001.5 1.5z" />
             </svg>
         </div>
     {% endif %}
 
     <!-- Borrowing Section -->
-    {% comment %} {% if user.is_authenticated %}
-        {% if paper.id in user_borrowed_papers %}
-            <button disabled class="bg-gray-400 text-white px-6 py-2 rounded-md cursor-not-allowed">
-                Already Borrowed
-            </button>
-        {% elif paper.available_copies > 0 %}
-            <form method="post" action="{% url 'borrow_paper' paper.id %}">
-                {% csrf_token %}
-                <button type="submit" 
-                        class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Borrow Paper
-                </button>
-            </form>
-        {% else %}
-            <button disabled class="bg-gray-400 text-white px-6 py-2 rounded-md cursor-not-allowed">
-                No Copies Available
-            </button>
-        {% endif %}
-    {% else %}
-        <a href="{% url 'login' %}" 
-           class="inline-block bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            Login to Borrow
-        </a>
-    {% endif %} {% endcomment %}
+    <div class="mt-8 flex justify-center">
+        <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-2xl">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Borrowing Information</h2>
+
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Available Copies: <span class="font-semibold">{{ paper.available_copies }}</span></p>
+                    <p class="text-sm text-gray-600">All borrow requests require admin approval</p>
+                </div>
+
+                {% if user.is_authenticated %}
+                    {% if paper.id in user_borrowed_papers %}
+                        <button disabled class="bg-gray-400 text-white px-6 py-2 rounded-md cursor-not-allowed">
+                            Already Borrowed
+                        </button>
+                    {% elif paper.available_copies > 0 %}
+                        <a href="{% url 'borrow_paper' paper.id %}"
+                           class="inline-block bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            Request to Borrow
+                        </a>
+                    {% else %}
+                        <button disabled class="bg-gray-400 text-white px-6 py-2 rounded-md cursor-not-allowed">
+                            No Copies Available
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}"
+                       class="inline-block bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Login to Borrow
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -15,14 +15,14 @@ def admin_dashboard(request):
     total_authors = Author.objects.count()
     active_borrows = Borrow.objects.filter(is_returned=False).count()
     total_citations = Citation.objects.count()
-    
+
     recent_papers = Paper.objects.all().order_by('-publication_date')[:5]
     recent_borrows = Borrow.objects.filter(is_returned=False).order_by('-borrow_date')[:5]
-    
+
     most_cited_papers = Paper.objects.annotate(
         citation_count=Count('paper_citations')
     ).order_by('-citation_count')[:5]
-    
+
     context = {
         'total_papers': total_papers,
         'total_authors': total_authors,
@@ -43,11 +43,11 @@ def manage_papers(request):
             Q(title__icontains=search_query) |
             Q(authors__name__icontains=search_query)
         ).distinct()
-    
+
     paginator = Paginator(papers, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     return render(request, 'scholar/admin/manage_papers.html', {
         'page_obj': page_obj,
         'search_query': search_query
@@ -56,7 +56,7 @@ def manage_papers(request):
 def manage_borrows(request):
     borrows = Borrow.objects.all().order_by('-borrow_date')
     status_filter = request.GET.get('status')
-    
+
     if status_filter == 'pending':
         borrows = borrows.filter(status='pending')
     elif status_filter == 'approved':
@@ -65,40 +65,60 @@ def manage_borrows(request):
         borrows = borrows.filter(status='rejected')
     elif status_filter == 'returned':
         borrows = borrows.filter(is_returned=True)
-    
+
     paginator = Paginator(borrows, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     return render(request, 'scholar/admin/manage_borrows.html', {
         'page_obj': page_obj,
         'status_filter': status_filter
     })
 @staff_member_required
+def admin_borrow_requests(request):
+    """
+    Displays all pending borrow requests for admin approval.
+    """
+    borrow_requests = Borrow.objects.filter(status='pending').order_by('-request_date')
+    return render(request, 'scholar/admin/borrow_requests.html', {'borrow_requests': borrow_requests})
+
+@staff_member_required
 def approve_borrow(request, borrow_id):
+    if request.method != 'POST':
+        return redirect('admin_borrow_requests')
+
     borrow = get_object_or_404(Borrow, id=borrow_id)
-    
+
     if borrow.status == 'pending':
         borrow.status = 'approved'
         borrow.save()
         messages.success(request, 'Borrow request approved.')
     else:
         messages.warning(request, 'Borrow request is not pending.')
-    
-    return redirect('manage_borrows')
+
+    return redirect('admin_borrow_requests')
 
 @staff_member_required
 def reject_borrow(request, borrow_id):
+    if request.method != 'POST':
+        return redirect('admin_borrow_requests')
+
     borrow = get_object_or_404(Borrow, id=borrow_id)
-    
+
     if borrow.status == 'pending':
         borrow.status = 'rejected'
         borrow.save()
-        messages.success(request, 'Borrow request rejected.')
+
+        # Increment available copies of the paper since we're rejecting the request
+        paper = borrow.paper
+        paper.available_copies += 1
+        paper.save()
+
+        messages.success(request, 'Borrow request rejected and available copies updated.')
     else:
         messages.warning(request, 'Borrow request is not pending.')
-    
-    return redirect('manage_borrows')
+
+    return redirect('admin_borrow_requests')
 
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.admin.views.decorators import staff_member_required
@@ -107,6 +127,9 @@ from .models import Borrow, Paper
 from django.utils import timezone
 @staff_member_required
 def mark_returned(request, borrow_id):
+    if request.method != 'POST':
+        return redirect('admin_borrow_requests')
+
     borrow = get_object_or_404(Borrow, id=borrow_id)
     if borrow.status == 'approved' and not borrow.is_returned:
         borrow.is_returned = True
@@ -131,10 +154,10 @@ def paper_analytics(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)
     borrow_history = Borrow.objects.filter(paper=paper).order_by('-borrow_date')
     citation_history = Citation.objects.filter(paper=paper).order_by('-citation_date')
-    
+
     # Get all papers except the current one for citation selection
     available_papers = Paper.objects.exclude(id=paper_id).order_by('title')
-    
+
     context = {
         'paper': paper,
         'borrow_history': borrow_history,
@@ -151,7 +174,7 @@ def author_analytics(request, author_id):
     author = get_object_or_404(Author, id=author_id)
     papers = author.paper_set.all()
     total_citations = Citation.objects.filter(paper__in=papers).count()
-    
+
     context = {
         'author': author,
         'papers': papers,
@@ -182,12 +205,12 @@ def upload_paper(request):
             return redirect('manage_papers')
     else:
         form = PaperUploadForm()
-    
+
     context = {
         'form': form,
         'title': 'Upload New Paper'
     }
-    
+
     if getattr(request, 'htmx', False):
         return render(request, 'scholar/admin/paper_form_modal.html', context)
     return render(request, 'scholar/admin/upload_paper.html', context)
@@ -215,12 +238,12 @@ def edit_paper(request, paper_id):
             return redirect('manage_papers')
     else:
         form = PaperUploadForm(instance=paper)
-    
+
     context = {
         'form': form,
         'paper': paper
     }
-    
+
     if getattr(request, 'htmx', False):
         return render(request, 'scholar/admin/paper_form_modal.html', context)
     return render(request, 'scholar/admin/edit_paper.html', context)
@@ -230,10 +253,10 @@ def delete_paper(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)
     title = paper.title
     paper.delete()
-    
+
     if request.headers.get('HX-Request'):
         return HttpResponse(status=200)
-    
+
     messages.success(request, f'Paper "{title}" has been deleted successfully.')
     return redirect('manage_papers')
 
@@ -243,21 +266,21 @@ def add_citation(request, paper_id):
         citing_paper_id = request.POST.get('citing_paper_id')
         paper = get_object_or_404(Paper, id=paper_id)
         citing_paper = get_object_or_404(Paper, id=citing_paper_id)
-        
+
         # Create citation if it doesn't exist
         citation, created = Citation.objects.get_or_create(
             paper=paper,
             cited_by=citing_paper,
             defaults={'citation_date': timezone.now()}
         )
-        
+
         if created:
             paper.citations = Citation.objects.filter(paper=paper).count()
             paper.save()
             messages.success(request, f'Citation added successfully.')
         else:
             messages.info(request, f'Citation already exists.')
-            
+
     return redirect('paper_analytics', paper_id=paper_id)
 
 @staff_member_required
@@ -266,10 +289,10 @@ def remove_citation(request, paper_id, citation_id):
         citation = get_object_or_404(Citation, id=citation_id, paper_id=paper_id)
         paper = citation.paper
         citation.delete()
-        
+
         # Update citation count
         paper.citations = Citation.objects.filter(paper=paper).count()
         paper.save()
-        
+
         messages.success(request, f'Citation removed successfully.')
     return redirect('paper_analytics', paper_id=paper_id)

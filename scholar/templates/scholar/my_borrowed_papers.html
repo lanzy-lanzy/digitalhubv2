@@ -31,13 +31,20 @@
                 {% for borrow in borrows %}
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ borrow.paper.title }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ borrow.paper.title }}</div>
+                        <div class="text-xs text-gray-500">Requested: {{ borrow.request_date|date:"M d, Y" }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ borrow.borrow_date }}</div>
+                        <div class="text-sm text-gray-900">{{ borrow.borrow_date|date:"M d, Y" }}</div>
+                        {% if borrow.borrow_reason %}
+                        <div class="text-xs text-gray-500 mt-1">Reason: {{ borrow.borrow_reason|truncatechars:30 }}</div>
+                        {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ borrow.return_date|default:"-" }}</div>
+                        <div class="text-sm text-gray-900">{{ borrow.return_date|date:"M d, Y"|default:"-" }}</div>
+                        {% if borrow.due_date and not borrow.is_returned %}
+                        <div class="text-xs text-gray-500 mt-1">Due: {{ borrow.due_date|date:"M d, Y" }}</div>
+                        {% endif %}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         {% if borrow.is_returned %}

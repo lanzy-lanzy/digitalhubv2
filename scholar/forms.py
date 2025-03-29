@@ -73,16 +73,16 @@ class StudentRegistrationForm(UserCreationForm):
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         user.email = self.cleaned_data['email']
-        
+
         if commit:
             user.save()  # Save the user so that the related UserProfile signal creates the profile.
-            
+
             # Update the auto-created UserProfile with additional information
             user_profile = user.userprofile
             user_profile.phone = self.cleaned_data['phone']
             user_profile.address = self.cleaned_data['address']
             user_profile.save()
-            
+
             # Create the Student record using the extra fields
             Student.objects.create(
                 user=user,
@@ -114,4 +114,31 @@ class ReservationForm(forms.Form):
         # Ensure the reserved date is in the future
         if reserved_date <= timezone.now().date():
             raise forms.ValidationError("Reservation date must be in the future.")
-        return reserved_date       
+        return reserved_date
+
+class BorrowForm(forms.Form):
+    borrow_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}),
+        label='Borrow Date',
+        initial=timezone.now().date
+    )
+    borrow_reason = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3, 'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}),
+        label='Reason for Borrowing',
+        help_text='Please provide a brief reason for borrowing this paper.'
+    )
+
+    def clean_borrow_date(self):
+        borrow_date = self.cleaned_data['borrow_date']
+        today = timezone.now().date()
+
+        # Ensure the borrow date is not in the past
+        if borrow_date < today:
+            raise forms.ValidationError("Borrow date cannot be in the past.")
+
+        # Ensure the borrow date is not more than 30 days in the future
+        max_date = today + timedelta(days=30)
+        if borrow_date > max_date:
+            raise forms.ValidationError(f"Borrow date cannot be more than 30 days in the future (max: {max_date}).")
+
+        return borrow_date

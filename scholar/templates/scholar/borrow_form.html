@@ -1,0 +1,69 @@
+{% extends 'scholar/base.html' %}
+
+{% block title %}Borrow Paper{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-blue-50 border-b border-blue-100">
+            <h1 class="text-2xl font-bold text-gray-800">Borrow Request</h1>
+        </div>
+        
+        <div class="p-6">
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ paper.title }}</h2>
+                <p class="text-sm text-gray-600 mb-2">
+                    <span class="font-medium">Authors:</span> 
+                    {% for author in paper.authors.all %}
+                        {{ author.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+                <p class="text-sm text-gray-600">
+                    <span class="font-medium">Publication Date:</span> {{ paper.publication_date }}
+                </p>
+            </div>
+            
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ form.borrow_date.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            {{ form.borrow_date.label }}
+                        </label>
+                        <div class="mt-1">
+                            {{ form.borrow_date }}
+                        </div>
+                        {% if form.borrow_date.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.borrow_date.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">Select the date you want to borrow this paper. Your request will need admin approval.</p>
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.borrow_reason.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            {{ form.borrow_reason.label }}
+                        </label>
+                        <div class="mt-1">
+                            {{ form.borrow_reason }}
+                        </div>
+                        {% if form.borrow_reason.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ form.borrow_reason.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">{{ form.borrow_reason.help_text }}</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between pt-4">
+                    <a href="{% url 'paper_detail' paper.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Submit Borrow Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

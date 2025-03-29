@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -26,17 +27,17 @@ class Student(models.Model):
         ('MAgDev-AE', 'Master of Agricultural Development - Agricultural Extension'),
         ('BSA-CS', 'Bachelor of Science in Agriculture - Crop Science'),
         ('BSA-AS', 'Bachelor of Science in Agriculture - Animal Science'),
-        
+
         # School of Teacher Education
         ('MAEd-EA', 'Master of Arts in Education - Educational Administration'),
         ('BEEd', 'Bachelor of Elementary Education'),
         ('BPEd', 'Bachelor of Physical Education'),
         ('BSEd-ENG', 'Bachelor of Secondary Education - English'),
         ('BSEd-MATH', 'Bachelor of Secondary Education - Mathematics'),
-        
+
         # School of Engineering and Technology
         ('BSIT', 'Bachelor of Science in Information Technology'),
-        
+
         # School of Criminal Justice Education
         ('BSCrim', 'Bachelor of Science in Criminology'),
         ('BSISM', 'Bachelor of Science in Industrial Security Management'),
@@ -80,7 +81,7 @@ class Paper(models.Model):
     viewers = models.ManyToManyField(User, related_name='viewed_papers', blank=True)
     pdf_file = models.FileField(upload_to='papers/', blank=True, null=True)
     program = models.CharField(
-        max_length=100, 
+        max_length=100,
         choices=Student.PROGRAM_CHOICES,
         default='BSIT'  # Setting default value to BSIT
     )
@@ -103,12 +104,14 @@ class Borrow(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     paper = models.ForeignKey(Paper, on_delete=models.CASCADE)
-    borrow_date = models.DateTimeField(auto_now_add=True)
+    borrow_date = models.DateTimeField(default=timezone.now)
     return_date = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     return_status = models.CharField(max_length=10, choices=RETURN_STATUS_CHOICES, null=True, blank=True)
-    is_returned = models.BooleanField(default=False)  # Add this field
+    is_returned = models.BooleanField(default=False)
     due_date = models.DateTimeField(null=True, blank=True)
+    borrow_reason = models.TextField(blank=True, null=True, help_text='Reason for borrowing this paper')
+    request_date = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ['-borrow_date']
@@ -116,7 +119,7 @@ class Borrow(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.paper.title}"
 class Citation(models.Model):
-    
+
     paper = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='paper_citations')
     cited_by = models.ForeignKey(Paper, on_delete=models.CASCADE, related_name='cited_papers')
     citation_date = models.DateField(auto_now_add=True)

@@ -119,7 +119,7 @@ class ReservationForm(forms.Form):
 class BorrowForm(forms.Form):
     borrow_date = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}),
-        label='Borrow Date',
+        label='Preferred Date',
         initial=timezone.now().date
     )
     borrow_reason = forms.CharField(

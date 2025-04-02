@@ -1,6 +1,6 @@
 {% extends 'scholar/base.html' %}
 
-{% block title %}JHCSC Research Hub{% endblock %}
+{% block title %}J.H. CSC - Computer Science Club{% endblock %}
 
 {% block content %}
 <style>
@@ -129,8 +129,8 @@
 <div class="hero-pattern rounded-xl overflow-hidden mb-8 shadow-lg">
     <div class="max-w-7xl mx-auto px-6 py-12 md:py-16 lg:py-20">
         <div class="max-w-3xl mx-auto text-center text-white">
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">JHCSC Research Repository</h1>
-            <p class="text-lg md:text-xl opacity-90 mb-8">Discover academic papers, research, and scholarly works from our community</p>
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">J.H. CSC Repository</h1>
+            <p class="text-lg md:text-xl opacity-90 mb-8">Discover projects, resources, and works from our academic community</p>
 
             <!-- Search Form -->
             <div class="search-container p-2 md:p-3 max-w-2xl mx-auto">
@@ -138,7 +138,7 @@
                     <div class="flex-1 relative">
                         <input type="text" name="q" value="{{ query }}"
                                class="search-input w-full pl-10 pr-4 py-3 md:py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                               placeholder="Search articles, authors, years, and more..." />
+                               placeholder="Search projects, members, technologies, and more..." />
                         <svg class="absolute left-3 top-3.5 h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -173,21 +173,38 @@
             <div class="mb-6">
                 <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
                     <svg class="h-4 w-4 mr-1 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
-                    Publication Date
+                    Publication Year
                 </h4>
                 <form method="get" action="{% url 'home' %}" class="space-y-3">
                     <input type="hidden" name="q" value="{{ query }}">
+                    {% if program %}<input type="hidden" name="program" value="{{ program }}">{% endif %}
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">From</label>
-                        <input type="date" name="date_from" value="{{ date_from }}"
+                        <label class="block text-sm text-gray-600 mb-1">From Year</label>
+                        <input type="number" name="year_from" value="{{ year_from }}" min="1900" max="2100" placeholder="e.g. 2020"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
                     <div>
-                        <label class="block text-sm text-gray-600 mb-1">To</label>
-                        <input type="date" name="date_to" value="{{ date_to }}"
+                        <label class="block text-sm text-gray-600 mb-1">To Year</label>
+                        <input type="number" name="year_to" value="{{ year_to }}" min="1900" max="2100" placeholder="e.g. 2025"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+
+                    <!-- Program Filter -->
+                    <div class="mt-6">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="h-4 w-4 mr-1 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            Program
+                        </h4>
+                        <select name="program" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="">All Programs</option>
+                            {% for code, name in program_choices %}
+                                <option value="{{ code }}" {% if program == code %}selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
 
                     <!-- Sort Options -->
@@ -203,7 +220,7 @@
                             <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
                             <option value="title_asc" {% if sort == 'title_asc' %}selected{% endif %}>Title (A-Z)</option>
                             <option value="title_desc" {% if sort == 'title_desc' %}selected{% endif %}>Title (Z-A)</option>
-                            <option value="citations" {% if sort == 'citations' %}selected{% endif %}>Most Cited</option>
+                            <option value="citations" {% if sort == 'citations' %}selected{% endif %}>Most Popular</option>
                         </select>
                     </div>
 
@@ -215,7 +232,7 @@
             </div>
 
             <!-- Active Filters -->
-            {% if date_from or date_to or sort %}
+            {% if year_from or year_to or sort or program %}
             <div class="mt-4 pt-4 border-t border-gray-200">
                 <h4 class="text-sm font-medium text-gray-700 mb-2 flex items-center">
                     <svg class="h-4 w-4 mr-1 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,10 +241,25 @@
                     Active Filters
                 </h4>
                 <div class="space-y-2">
-                    {% if date_from or date_to %}
+                    {% if year_from or year_to %}
                     <div class="flex items-center justify-between text-sm bg-emerald-50 p-2 rounded-md">
-                        <span class="text-emerald-800">Date Range</span>
-                        <a href="?{% if query %}q={{ query }}{% endif %}" class="text-red-600 hover:text-red-800">
+                        <span class="text-emerald-800">Year Range: {% if year_from %}{{ year_from }}{% else %}earliest{% endif %} - {% if year_to %}{{ year_to }}{% else %}latest{% endif %}</span>
+                        <a href="?{% if query %}q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="text-red-600 hover:text-red-800">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if program %}
+                    <div class="flex items-center justify-between text-sm bg-emerald-50 p-2 rounded-md">
+                        <span class="text-emerald-800">Program:
+                            {% for code, name in program_choices %}
+                                {% if code == program %}{{ name }}{% endif %}
+                            {% endfor %}
+                        </span>
+                        <a href="?{% if query %}q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="text-red-600 hover:text-red-800">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
@@ -249,21 +281,30 @@
             {% endif %}
 
             <div class="space-y-6">
-                {% if query or date_from or date_to %}
+                {% if query or year_from or year_to or program %}
                     <div class="bg-white rounded-lg p-4 shadow-sm">
-                        <div class="flex items-center text-sm text-gray-600">
+                        <div class="flex flex-wrap items-center text-sm text-gray-600">
                             <svg class="h-5 w-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             {% if query %}
                                 <span>Showing results for: <span class="font-medium text-emerald-700">"{{ query }}"</span></span>
                             {% endif %}
-                            {% if date_from or date_to %}
-                                <span class="ml-2">Date range:
+                            {% if program %}
+                                <span class="ml-2">Program:
                                     <span class="font-medium text-emerald-700">
-                                        {% if date_from %}{{ date_from }}{% else %}earliest{% endif %}
+                                        {% for code, name in program_choices %}
+                                            {% if code == program %}{{ name }}{% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </span>
+                            {% endif %}
+                            {% if year_from or year_to %}
+                                <span class="ml-2">Year range:
+                                    <span class="font-medium text-emerald-700">
+                                        {% if year_from %}{{ year_from }}{% else %}earliest{% endif %}
                                         to
-                                        {% if date_to %}{{ date_to }}{% else %}latest{% endif %}
+                                        {% if year_to %}{{ year_to }}{% else %}latest{% endif %}
                                     </span>
                                 </span>
                             {% endif %}
@@ -284,17 +325,17 @@
                                                 <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                 </svg>
-                                                {{ paper.available_copies }} available
+                                                Available
                                             </span>
                                         {% else %}
                                             <span class="badge badge-unavailable mr-2">
                                                 <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                                 </svg>
-                                                Not available
+                                                Unavailable
                                             </span>
                                         {% endif %}
-                                        <span class="text-xs text-gray-500">Published {{ paper.publication_date|date:"M d, Y" }}</span>
+                                        <span class="text-xs text-gray-500">Created {{ paper.publication_date|date:"M d, Y" }}</span>
                                     </div>
 
                                     <h2 class="text-xl font-semibold text-gray-900 mb-2 leading-tight">
@@ -328,6 +369,15 @@
                                         <div class="flex items-center space-x-4 mt-1">
                                             <span class="flex items-center text-gray-500">
                                                 <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                </svg>
+                                                {% for code, name in program_choices %}
+                                                    {% if code == paper.program %}{{ name }}{% endif %}
+                                                {% endfor %}
+                                            </span>
+
+                                            <span class="flex items-center text-gray-500">
+                                                <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                                 </svg>
@@ -337,9 +387,9 @@
                                             {% if paper.citations > 0 %}
                                                 <span class="flex items-center text-gray-500">
                                                     <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                                                     </svg>
-                                                    {{ paper.citations }} citations
+                                                    {{ paper.citations }} likes
                                                 </span>
                                             {% endif %}
                                         </div>
@@ -363,13 +413,20 @@
                                                 </svg>
                                                 Already Borrowed
                                             </span>
+                                        {% elif paper.available_copies <= 0 %}
+                                            <span class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 cursor-not-allowed">
+                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                                </svg>
+                                                Unavailable for Borrowing
+                                            </span>
                                         {% else %}
                                             <a href="{% url 'borrow_paper' paper.id %}"
                                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
                                                 <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                                 </svg>
-                                                Request to Borrow
+                                                Request Borrow
                                             </a>
                                         {% endif %}
 
@@ -378,7 +435,7 @@
                                             <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                             </svg>
-                                            View Details
+                                            View Project
                                         </a>
                                     {% else %}
                                         <a href="{% url 'login' %}"
@@ -426,9 +483,12 @@
                         <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12a4 4 0 00-4-4h-.01M12 12a4 4 0 01-4 4h-.01"/>
                         </svg>
-                        <h3 class="mt-4 text-xl font-medium text-gray-900">No results found</h3>
+                        <h3 class="mt-4 text-xl font-medium text-gray-900">No projects found</h3>
                         <p class="mt-2 text-gray-500">Try adjusting your search terms or filters</p>
-                        <a href="{% url 'home' %}" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700">
+                        <a href="{% url 'home' %}" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200">
+                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
                             Clear all filters
                         </a>
                     </div>
@@ -439,7 +499,7 @@
             {% if papers.paginator.num_pages > 1 %}
             <div class="pagination">
                 {% if papers.has_previous %}
-                    <a href="?page={{ papers.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="flex items-center">
+                    <a href="?page={{ papers.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="flex items-center">
                         <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                         </svg>
@@ -452,7 +512,7 @@
                         {% if papers.number == i %}
                             <span class="current">{{ i }}</span>
                         {% elif i > papers.number|add:'-3' and i < papers.number|add:'3' %}
-                            <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ i }}</a>
+                            <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ i }}</a>
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -460,7 +520,7 @@
                 <span class="md:hidden current">Page {{ papers.number }} of {{ papers.paginator.num_pages }}</span>
 
                 {% if papers.has_next %}
-                    <a href="?page={{ papers.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="flex items-center">
+                    <a href="?page={{ papers.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="flex items-center">
                         Next
                         <svg class="h-5 w-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>

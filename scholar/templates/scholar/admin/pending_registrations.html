@@ -1,87 +1,361 @@
 {% extends 'scholar/base.html' %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Pending Registrations</h1>
+<div class="container mx-auto px-4 py-8 bg-gradient-to-b from-emerald-50/50 to-white">
+    <!-- Header Section with Stats -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Pending Registrations</h1>
+            <p class="text-gray-600">New account requests awaiting approval</p>
+        </div>
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Username
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Email
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Phone
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Student ID
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Program
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Year Level
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                    </th>
-                </tr>
-            </thead>
+        <div class="mt-4 md:mt-0 bg-white rounded-xl shadow-sm border border-emerald-100 p-4 flex items-center transition-all duration-300 hover:shadow-md">
+            <div class="flex items-center">
+                <div class="p-3 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-full mr-3 shadow-inner">
+                    <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Pending Requests</p>
+                    <p class="text-2xl font-bold text-emerald-700">{{ pending_users|length }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white shadow-lg rounded-xl overflow-hidden mb-8 border border-gray-100">
+        <!-- Search and Filter Bar -->
+        <div class="bg-gradient-to-r from-emerald-50 to-white px-6 py-5 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+            <h2 class="text-lg font-semibold text-emerald-800">Registration Requests</h2>
+
+            <div class="flex items-center space-x-2">
+                <div class="relative">
+                    <input type="text" id="search-users" placeholder="Search by name or ID..."
+                           class="pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 text-sm shadow-sm transition-all duration-200 hover:shadow focus:shadow">
+                    <div class="absolute left-3 top-3">
+                        <svg class="h-4 w-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gradient-to-r from-gray-50 to-white">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+                            Username
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+                            Email
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider hidden md:table-cell">
+                            Phone
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider hidden md:table-cell">
+                            Student ID
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider hidden lg:table-cell">
+                            Program
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+                            Year Level
+                        </th>
+                    </tr>
+                </thead>
             <tbody class="bg-white divide-y divide-gray-200">
+                {% if pending_users %}
                 {% for user_profile in pending_users %}
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">{{ user_profile.user.username }}</div>
+                <tr class="hover:bg-emerald-50/30 transition-all duration-150">
+                    <!-- User Information with Avatar -->
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-12 w-12 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-md">
+                                <span class="text-white font-bold text-base">{{ user_profile.user.first_name|slice:"0:1" }}{{ user_profile.user.last_name|slice:"0:1" }}</span>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-semibold text-gray-900">{{ user_profile.user.username }}</div>
+                                <div class="text-xs text-emerald-600 font-medium flex items-center mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                        <svg class="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        New Account
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ user_profile.user.email }}</div>
+
+                    <!-- Email with Icon -->
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-blue-50 rounded-lg mr-3">
+                                <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">{{ user_profile.user.email }}</div>
+                                <div class="text-xs text-gray-500 mt-1">{{ user_profile.user.first_name }} {{ user_profile.user.last_name }}</div>
+                            </div>
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ user_profile.phone }}</div>
+
+                    <!-- Phone with Icon -->
+                    <td class="px-6 py-5 whitespace-nowrap hidden md:table-cell">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-indigo-50 rounded-lg mr-3">
+                                <svg class="h-5 w-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-sm font-medium text-gray-900">{{ user_profile.phone }}</div>
+                        </div>
                     </td>
+
                     {% if user_profile.user.student %}
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ user_profile.user.student.student_id }}</div>
+                    <!-- Student ID with Badge -->
+                    <td class="px-6 py-5 whitespace-nowrap hidden md:table-cell">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-purple-50 rounded-lg mr-3">
+                                <svg class="h-5 w-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                                </svg>
+                            </div>
+                            <div class="text-sm font-medium text-gray-900">{{ user_profile.user.student.student_id }}</div>
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ user_profile.user.student.program }}</div>
+
+                    <!-- Program with Icon -->
+                    <td class="px-6 py-5 whitespace-nowrap hidden lg:table-cell">
+                        <div class="flex items-start">
+                            <div class="p-2 bg-amber-50 rounded-lg mr-3 mt-0.5">
+                                <svg class="h-5 w-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    {% with program_code=user_profile.user.student.program %}
+                                        {% if program_code == 'BSCrim' %}
+                                            Bachelor of Science in Criminology
+                                        {% elif program_code == 'BSISM' %}
+                                            Bachelor of Science in Industrial Security Management
+                                        {% elif program_code == 'BSIT' %}
+                                            Bachelor of Science in Information Technology
+                                        {% elif program_code == 'BEEd' %}
+                                            Bachelor of Elementary Education
+                                        {% elif program_code == 'BPEd' %}
+                                            Bachelor of Physical Education
+                                        {% elif program_code == 'BSEd-ENG' %}
+                                            Bachelor of Secondary Education - English
+                                        {% elif program_code == 'BSEd-MATH' %}
+                                            Bachelor of Secondary Education - Mathematics
+                                        {% elif program_code == 'BSA-CS' %}
+                                            Bachelor of Science in Agriculture - Crop Science
+                                        {% elif program_code == 'BSA-AS' %}
+                                            Bachelor of Science in Agriculture - Animal Science
+                                        {% elif program_code == 'MAgDev-AE' %}
+                                            Master of Agricultural Development - Agricultural Extension
+                                        {% elif program_code == 'MAEd-EA' %}
+                                            Master of Arts in Education - Educational Administration
+                                        {% else %}
+                                            {{ program_code }}
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">{{ user_profile.user.student.program }}</div>
+                            </div>
+                        </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">
-                            {% for value, label in user_profile.user.student.YEAR_CHOICES %}
-                                {% if user_profile.user.student.year_level|stringformat:"s" == value|stringformat:"s" %}
-                                    {{ label }}
-                                {% endif %}
-                            {% endfor %}
+
+                    <!-- Year Level with Badge -->
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-emerald-50 rounded-lg mr-3">
+                                <svg class="h-5 w-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                            </div>
+                            <span class="px-3 py-1.5 text-sm font-medium bg-emerald-100 text-emerald-800 rounded-lg shadow-sm">
+                                {% with year=user_profile.user.student.year_level %}
+                                    {% if year == 1 %}
+                                        1st Year
+                                    {% elif year == 2 %}
+                                        2nd Year
+                                    {% elif year == 3 %}
+                                        3rd Year
+                                    {% elif year == 4 %}
+                                        4th Year
+                                    {% elif year == 5 %}
+                                        5th Year
+                                    {% else %}
+                                        {{ year }}
+                                    {% endif %}
+                                {% endwith %}
+                            </span>
                         </div>
                     </td>
                     {% else %}
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">N/A</div>
+                        <td class="px-6 py-5 whitespace-nowrap hidden md:table-cell">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-gray-100 rounded-lg mr-3 opacity-50">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path>
+                                    </svg>
+                                </div>
+                                <div class="text-sm text-gray-500 italic">N/A</div>
+                            </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">N/A</div>
+                        <td class="px-6 py-5 whitespace-nowrap hidden lg:table-cell">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-gray-100 rounded-lg mr-3 opacity-50">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                </div>
+                                <div class="text-sm text-gray-500 italic">N/A</div>
+                            </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">N/A</div>
+                        <td class="px-6 py-5 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="p-2 bg-gray-100 rounded-lg mr-3 opacity-50">
+                                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                    </svg>
+                                </div>
+                                <div class="text-sm text-gray-500 italic">N/A</div>
+                            </div>
                         </td>
                     {% endif %}
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{% url 'approve_registration' user_profile.user.id %}" class="inline-flex items-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
-                            Approve
-                        </a>
-                        <a href="{% url 'reject_registration' user_profile.user.id %}" class="inline-flex items-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors ml-2">
-                            Reject
-                        </a>
+                </tr>
+                <tr>
+                    <td colspan="6" class="px-6 py-0 border-t border-gray-100">
+                        <div class="flex justify-end space-x-3 py-3">
+                            <form method="POST" action="{% url 'approve_registration' user_profile.user.id %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5">
+                                    <svg class="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Approve
+                                </button>
+                            </form>
+                            <form method="POST" action="{% url 'reject_registration' user_profile.user.id %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                   class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 transform hover:-translate-y-0.5">
+                                    <svg class="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    Reject
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center">
+                        <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden md:max-w-2xl p-8 border border-gray-100">
+                            <div class="text-center">
+                                <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 mb-6 shadow-inner">
+                                    <svg class="h-10 w-10 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2">All Caught Up!</h3>
+                                <p class="mt-2 text-base text-gray-600 max-w-sm mx-auto leading-relaxed">
+                                    There are no new account requests awaiting approval. All registration requests have been processed.
+                                </p>
+                                <div class="mt-8">
+                                    <a href="{% url 'admin_dashboard' %}" class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200 transform hover:-translate-y-0.5">
+                                        <svg class="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                        </svg>
+                                        Return to Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="mt-8 bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+        <div class="flex flex-col md:flex-row items-start">
+            <div class="flex-shrink-0 bg-blue-50 p-4 rounded-full mb-4 md:mb-0">
+                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div class="md:ml-6 w-full">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">About Registration Approval</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-br from-emerald-50 to-emerald-50/30 rounded-xl p-5 border border-emerald-100 shadow-sm">
+                        <h4 class="text-emerald-800 font-medium text-lg mb-3 flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            When you approve a registration:
+                        </h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-gray-700">The user account will be activated</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-gray-700">The user will be able to log in to the system</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-emerald-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-gray-700">The user will have access to all student features</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-50 to-red-50/30 rounded-xl p-5 border border-red-100 shadow-sm">
+                        <h4 class="text-red-800 font-medium text-lg mb-3 flex items-center">
+                            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            When you reject a registration:
+                        </h4>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <span class="text-gray-700">The user account will be permanently deleted</span>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-5 w-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                                <span class="text-gray-700">The user will need to register again if they want to use the system</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

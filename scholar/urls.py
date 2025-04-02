@@ -51,8 +51,10 @@ urlpatterns = [
 
     path('my_bookmarked_papers/', my_bookmarked_papers, name='my_bookmarked_papers'),
 
-    path('admin/reports/', views.admin_reports, name='admin_reports'),
-     path('admin/borrows/<int:borrow_id>/', view_borrow, name='view_borrow'),
+    path('admin/reports/', views_admin.admin_reports, name='admin_reports'),
+    path('api/admin/reports/', views_admin.admin_reports_api, name='admin_reports_api'),
+    path('admin/reports/pdf/', views_admin.generate_pdf_report, name='generate_pdf_report'),
+    path('admin/borrows/<int:borrow_id>/', view_borrow, name='view_borrow'),
 ]
 
 

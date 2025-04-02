@@ -22,24 +22,41 @@ from scholar.models import Paper, Borrow
 
 def home(request):
     query = request.GET.get('q', '')
-    date_from = request.GET.get('date_from', '')
-    date_to = request.GET.get('date_to', '')
+    year_from = request.GET.get('year_from', '')
+    year_to = request.GET.get('year_to', '')
     sort = request.GET.get('sort', 'newest')
+    program = request.GET.get('program', '')
 
     papers = Paper.objects.all()
 
     # Search filtering
     if query:
-        filters = Q(title__icontains=query) | Q(abstract__icontains=query) | Q(authors__name__icontains=query)
+        # Create a list to store all program choices for searching
+        program_choices = dict(Student.PROGRAM_CHOICES)
+        program_filters = Q()
+
+        # Check if query matches any program code or name
+        for code, name in Student.PROGRAM_CHOICES:
+            if query.lower() in code.lower() or query.lower() in name.lower():
+                program_filters |= Q(program=code)
+
+        # Main search filters including program search
+        filters = Q(title__icontains=query) | Q(abstract__icontains=query) | Q(authors__name__icontains=query) | program_filters
+
         if query.isdigit():
             filters |= Q(publication_date__year=int(query))
+
         papers = papers.filter(filters).distinct()
 
-    # Date range filtering
-    if date_from:
-        papers = papers.filter(publication_date__gte=date_from)
-    if date_to:
-        papers = papers.filter(publication_date__lte=date_to)
+    # Program filtering
+    if program:
+        papers = papers.filter(program=program)
+
+    # Year range filtering
+    if year_from and year_from.isdigit():
+        papers = papers.filter(publication_date__year__gte=int(year_from))
+    if year_to and year_to.isdigit():
+        papers = papers.filter(publication_date__year__lte=int(year_to))
 
     # Sorting
     if sort == 'newest':
@@ -53,7 +70,10 @@ def home(request):
     elif sort == 'citations':
         papers = papers.order_by('-citations')
 
-    # Pagination (your existing pagination code)
+    # Get all program choices for the filter dropdown
+    program_choices = Student.PROGRAM_CHOICES
+
+    # Pagination
     paginator = Paginator(papers, 10)
     page = request.GET.get('page')
     papers = paginator.get_page(page)
@@ -61,9 +81,11 @@ def home(request):
     context = {
         'papers': papers,
         'query': query,
-        'date_from': date_from,
-        'date_to': date_to,
+        'year_from': year_from,
+        'year_to': year_to,
         'sort': sort,
+        'program': program,
+        'program_choices': program_choices
     }
 
     return render(request, 'scholar/home.html', context)
@@ -151,7 +173,7 @@ def borrow_paper(request, paper_id):
             paper.available_copies = paper.available_copies - 1
             paper.save()
 
-            messages.success(request, f'Borrow request submitted for {borrow_date}. If approved, please return the paper by {due_date.date()}.')
+            messages.success(request, f'Borrow request submitted. Note: If approved, your 7-day borrowing period will start from the approval date, not from {borrow_date}.')
             return redirect('my_borrowed_papers')
     else:
         # Initialize form with default values
@@ -267,8 +289,20 @@ class RegisterView(CreateView):
                 # Deactivate the user until admin approval.
                 user.is_active = False
                 user.save()
+
+                # Explicitly mark the user profile as not approved
+                if hasattr(user, 'userprofile'):
+                    user.userprofile.is_approved = False
+                    user.userprofile.save()
+
+                # Log the student creation for debugging
+                if hasattr(user, 'student'):
+                    print(f"Created student record for {user.username}: ID={user.student.student_id}, Program={user.student.program}")
+                else:
+                    print(f"No student record created for {user.username}")
+
                 messages.success(self.request, 'Registration successful! Awaiting admin approval.')
-                return redirect(self.success_url)
+                return redirect('pending_approval')
         except Exception as e:
             messages.error(self.request, f'An error occurred during registration: {str(e)}')
             return self.form_invalid(form)
@@ -296,29 +330,54 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 @staff_member_required
 def admin_pending_registrations(request):
-    pending_users = UserProfile.objects.filter(is_approved=False).select_related('user', 'user__student')
+    # Get all user profiles that are not approved and where the user is not active
+    # This ensures we only show newly created accounts pending approval
+    pending_users = UserProfile.objects.filter(
+        is_approved=False,
+        user__is_active=False
+    ).select_related('user', 'user__student')
+
+    # Add debug information to check if student data is being retrieved
+    for profile in pending_users:
+        if hasattr(profile.user, 'student'):
+            # Log or print student information for debugging
+            print(f"Student info for {profile.user.username}: ID={profile.user.student.student_id}, Program={profile.user.student.program}")
+        else:
+            print(f"No student data for {profile.user.username}")
+
+    # Debug the total count of pending users
+    print(f"Total pending users found: {pending_users.count()}")
+
     return render(request, 'scholar/admin/pending_registrations.html', {'pending_users': pending_users})
 
 @staff_member_required
 def approve_registration(request, user_id):
+    if request.method != 'POST':
+        return redirect('admin_pending_registrations')
+
     user_profile = get_object_or_404(UserProfile, user_id=user_id)
     user_profile.is_approved = True
     user_profile.user.is_active = True  # Activate the user
     user_profile.save()
     user_profile.user.save()
-    messages.success(request, f'User {user_profile.user.username} has been approved.')
+    messages.success(request, f'New account for {user_profile.user.username} has been approved.')
     return redirect('admin_pending_registrations')
 
 @staff_member_required
 def reject_registration(request, user_id):
+    if request.method != 'POST':
+        return redirect('admin_pending_registrations')
+
     user_profile = get_object_or_404(UserProfile, user_id=user_id)
+    username = user_profile.user.username  # Store username before deletion
     user_profile.user.delete()  # Delete the user if rejected
-    messages.success(request, f'User {user_profile.user.username} has been rejected.')
+    messages.success(request, f'New account for {username} has been rejected.')
     return redirect('admin_pending_registrations')
 
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.models import User
 from .models import UserProfile
 
 def user_login(request):
@@ -328,20 +387,40 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            if user.is_superuser:  # Allow superusers to log in directly
+            if user.is_superuser or user.is_staff:  # Allow superusers and staff to log in directly
                 login(request, user)
-                return redirect('admin_dashboard')
+                if user.is_staff:
+                    return redirect('admin_dashboard')
+                return redirect('home')
             try:
                 user_profile = UserProfile.objects.get(user=user)
                 if user_profile.is_approved:
                     login(request, user)
                     return redirect('home')
                 else:
-                    messages.error(request, 'Your account is pending admin approval.')
+                    # Provide a more detailed message for pending approval
+                    messages.warning(request,
+                        'Your account is pending admin approval. '
+                        'Please wait for an administrator to review your registration. '
+                        'This process typically takes 1-2 business days. '
+                        'You will be able to log in once your account is approved.')
+                    # Redirect to the pending approval page to show more information
+                    return redirect('pending_approval')
             except UserProfile.DoesNotExist:
-                messages.error(request, 'User profile not found.')
+                messages.error(request, 'User profile not found. Please contact support.')
         else:
-            messages.error(request, 'Invalid username or password.')
+            # Check if the username exists but is inactive (pending approval)
+            try:
+                user_obj = User.objects.get(username=username, is_active=False)
+                if user_obj:
+                    messages.warning(request,
+                        'Your account is pending admin approval. '
+                        'Please wait for an administrator to review your registration. '
+                        'This process typically takes 1-2 business days.')
+                    return redirect('pending_approval')
+            except User.DoesNotExist:
+                # Username doesn't exist or password is wrong
+                messages.error(request, 'Invalid username or password.')
 
     return render(request, 'registration/login.html')
 
@@ -474,18 +553,189 @@ def my_bookmarked_papers(request):
     return render(request, 'scholar/my_bookmarked_papers.html', {'bookmarks': bookmarks})
 
 from django.shortcuts import render
-from scholar.models import Borrow
+from scholar.models import Borrow, Paper
+from django.db.models import Count, Q
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils import timezone
+from datetime import datetime, timedelta
 
+@staff_member_required
 def admin_reports(request):
-    borrows = Borrow.objects.all()
-    return render(request, 'scholar/admin_reports.html', {'borrows': borrows})
+    # Get filter parameters
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+    status = request.GET.get('status', '')
+    program = request.GET.get('program', '')
+    user_query = request.GET.get('user_query', '')
+    paper_query = request.GET.get('paper_query', '')
+
+    # Base queryset
+    borrows = Borrow.objects.all().select_related('user', 'paper')
+
+    # Apply filters
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            borrows = borrows.filter(request_date__date__gte=start_date_obj)
+        except ValueError:
+            pass
+
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+            borrows = borrows.filter(request_date__date__lte=end_date_obj)
+        except ValueError:
+            pass
+
+    if status:
+        borrows = borrows.filter(status=status)
+
+    if program:
+        borrows = borrows.filter(paper__program=program)
+
+    if user_query:
+        borrows = borrows.filter(
+            Q(user__username__icontains=user_query) |
+            Q(user__first_name__icontains=user_query) |
+            Q(user__last_name__icontains=user_query)
+        )
+
+    if paper_query:
+        borrows = borrows.filter(paper__title__icontains=paper_query)
+
+    # Get statistics for summary cards
+    total_borrows = borrows.count()
+    active_borrows = borrows.filter(status='approved', is_returned=False).count()
+    pending_borrows = borrows.filter(status='pending').count()
+    overdue_borrows = borrows.filter(
+        status='approved',
+        is_returned=False,
+        due_date__lt=timezone.now()
+    ).count()
+
+    # Get program choices for filter dropdown
+    program_choices = Paper._meta.get_field('program').choices
+
+    # Get top borrowed papers
+    top_papers = Paper.objects.annotate(
+        borrow_count=Count('borrow')
+    ).order_by('-borrow_count')[:5]
+
+    # Get monthly borrow statistics for the chart
+    current_year = timezone.now().year
+    monthly_stats = []
+
+    for month in range(1, 13):
+        month_borrows = Borrow.objects.filter(
+            request_date__year=current_year,
+            request_date__month=month
+        ).count()
+        monthly_stats.append({
+            'month': month,
+            'count': month_borrows
+        })
+
+    context = {
+        'borrows': borrows.order_by('-request_date'),
+        'total_borrows': total_borrows,
+        'active_borrows': active_borrows,
+        'pending_borrows': pending_borrows,
+        'overdue_borrows': overdue_borrows,
+        'top_papers': top_papers,
+        'monthly_stats': monthly_stats,
+        'program_choices': program_choices,
+        'filters': {
+            'start_date': start_date,
+            'end_date': end_date,
+            'status': status,
+            'program': program,
+            'user_query': user_query,
+            'paper_query': paper_query
+        }
+    }
+
+    return render(request, 'scholar/admin_reports.html', context)
 
 from django.shortcuts import render, get_object_or_404
 from scholar.models import Borrow
+from django.http import JsonResponse
 
 def view_borrow(request, borrow_id):
     borrow = get_object_or_404(Borrow, id=borrow_id)
     return render(request, 'scholar/view_borrow.html', {'borrow': borrow})
+
+@staff_member_required
+def admin_reports_api(request):
+    # Get filter parameters
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+    status = request.GET.get('status', '')
+    program = request.GET.get('program', '')
+    user_query = request.GET.get('user_query', '')
+    paper_query = request.GET.get('paper_query', '')
+
+    # Base queryset
+    borrows = Borrow.objects.all().select_related('user', 'paper')
+
+    # Apply filters
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
+            borrows = borrows.filter(request_date__date__gte=start_date_obj)
+        except ValueError:
+            pass
+
+    if end_date:
+        try:
+            end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
+            borrows = borrows.filter(request_date__date__lte=end_date_obj)
+        except ValueError:
+            pass
+
+    if status:
+        borrows = borrows.filter(status=status)
+
+    if program:
+        borrows = borrows.filter(paper__program=program)
+
+    if user_query:
+        borrows = borrows.filter(
+            Q(user__username__icontains=user_query) |
+            Q(user__first_name__icontains=user_query) |
+            Q(user__last_name__icontains=user_query)
+        )
+
+    if paper_query:
+        borrows = borrows.filter(paper__title__icontains=paper_query)
+
+    # Prepare data for JSON response
+    borrow_data = []
+    for borrow in borrows.order_by('-request_date'):
+        borrow_data.append({
+            'id': borrow.id,
+            'user': {
+                'id': borrow.user.id,
+                'username': borrow.user.username,
+                'full_name': f"{borrow.user.first_name} {borrow.user.last_name}".strip() or borrow.user.username
+            },
+            'paper': {
+                'id': borrow.paper.id,
+                'title': borrow.paper.title
+            },
+            'request_date': borrow.request_date.strftime('%Y-%m-%d'),
+            'borrow_date': borrow.borrow_date.strftime('%Y-%m-%d') if borrow.borrow_date else None,
+            'due_date': borrow.due_date.strftime('%Y-%m-%d') if borrow.due_date else None,
+            'return_date': borrow.return_date.strftime('%Y-%m-%d') if borrow.return_date else None,
+            'status': borrow.status,
+            'is_returned': borrow.is_returned,
+            'borrow_reason': borrow.borrow_reason,
+            'is_overdue': borrow.due_date and borrow.due_date < timezone.now() and not borrow.is_returned
+        })
+
+    return JsonResponse({
+        'borrows': borrow_data,
+        'total_count': len(borrow_data)
+    })
 
 @staff_member_required
 def paper_analytics(request, paper_id):

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JHCSC Research Hub - {% block title %}{% endblock %}</title>
+    <title>J.H. CSC - {% block title %}{% endblock %}</title>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,7 +31,7 @@
     </main>
 
     <!-- Modal Container -->
-    <div id="modal-container" 
+    <div id="modal-container"
          class="hidden fixed inset-0 z-50 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
          hx-target="this"
          hx-swap="innerHTML">
@@ -53,5 +53,7 @@
     </script>
 
     {% include 'scholar/partials/footer.html' %}
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

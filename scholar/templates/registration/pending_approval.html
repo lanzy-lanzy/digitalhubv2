@@ -1,17 +1,36 @@
 {% extends 'scholar/base.html' %}
 
+{% block title %}Registration Pending Approval - Scholar{% endblock %}
+
 {% block content %}
 <div class="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50 to-emerald-100 pattern-dots text-emerald-900/5">
     <div class="max-w-2xl w-full">
         <div class="bg-white py-8 px-6 shadow-2xl sm:rounded-xl sm:px-12 backdrop-blur-sm bg-opacity-90 border border-emerald-100">
             <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-6">
+                    <svg class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Registration Submitted</h2>
-                <p class="text-lg text-gray-600">
-                    Your registration has been submitted successfully. Please wait for admin approval.
+                <p class="text-lg text-gray-600 mb-2">
+                    Your registration has been submitted successfully and is awaiting admin approval.
                 </p>
+                <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-5 rounded-lg text-left shadow-md">
+                    <h3 class="font-medium text-yellow-800 mb-2 text-lg">What happens next?</h3>
+                    <ul class="list-disc pl-5 text-sm text-yellow-700 space-y-1">
+                        <li>An administrator will review your registration details</li>
+                        <li>Once approved, you'll be able to log in with your credentials</li>
+                        <li>This process typically takes 1-2 business days</li>
+                        <li>You will not be able to log in until your account is approved</li>
+                    </ul>
+                </div>
                 <div class="mt-6">
-                    <a href="{% url 'home' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <a href="{% url 'home' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                         Return to Home
+                    </a>
+                    <a href="{% url 'login' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 ml-3">
+                        Go to Login
                     </a>
                 </div>
             </div>

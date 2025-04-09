@@ -350,11 +350,13 @@ def admin_reports_api(request):
             pass
 
     if status:
+        now = timezone.now()
         if status == 'unreturned':
             borrows = borrows.filter(status='approved', is_returned=False)
         elif status == 'past_due':
-            now = timezone.now()
             borrows = borrows.filter(status='approved', is_returned=False, due_date__lt=now)
+        elif status == 'returned':
+            borrows = borrows.filter(is_returned=True)
         else:
             borrows = borrows.filter(status=status)
 
@@ -516,14 +518,18 @@ def generate_pdf_report(request):
     normal_style = styles["Normal"]
     heading_style = styles["Heading2"]
 
-    # Add title
-    report_title = "Borrow Management Report"
-    if start_date and end_date:
-        report_title += f" ({start_date} to {end_date})"
-    elif start_date:
-        report_title += f" (From {start_date})"
-    elif end_date:
-        report_title += f" (Until {end_date})"
+    # Get custom report title if provided, otherwise use default
+    custom_title = request.GET.get('report_title', '')
+    report_title = custom_title if custom_title else "Borrow Management Report"
+
+    # Add date range to title if not already included in custom title
+    if not custom_title:
+        if start_date and end_date:
+            report_title += f" ({start_date} to {end_date})"
+        elif start_date:
+            report_title += f" (From {start_date})"
+        elif end_date:
+            report_title += f" (Until {end_date})"
 
     elements.append(Paragraph(report_title, title_style))
 

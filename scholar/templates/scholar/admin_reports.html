@@ -189,7 +189,7 @@
     <!-- Report Table -->
     <div id="report-table" class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
         <div class="p-6 border-b border-gray-100">
-            <h2 class="text-lg font-semibold text-gray-900">Borrow Requests</h2>
+            <h2 class="text-lg font-semibold text-gray-900" id="report-title">Borrow Requests</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -221,6 +221,9 @@
             user_query: document.getElementById('user_query').value,
             paper_query: document.getElementById('paper_query').value
         };
+
+        // Update report title based on selected status
+        updateReportTitle(filters.status);
 
         // Convert filters to URL parameters
         const params = new URLSearchParams(filters);
@@ -320,11 +323,45 @@
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
+    function updateReportTitle(status) {
+        const reportTitleElement = document.getElementById('report-title');
+        let titleText = 'Borrow Requests';
+
+        // Set title based on status
+        if (status) {
+            switch(status) {
+                case 'pending':
+                    titleText = 'Pending Borrow Requests';
+                    break;
+                case 'approved':
+                    titleText = 'Approved Borrows';
+                    break;
+                case 'rejected':
+                    titleText = 'Rejected Borrow Requests';
+                    break;
+                case 'returned':
+                    titleText = 'Returned Borrows';
+                    break;
+                case 'unreturned':
+                    titleText = 'Unreturned Borrows';
+                    break;
+                case 'past_due':
+                    titleText = 'Past Due Borrows';
+                    break;
+                default:
+                    titleText = 'All Borrow Requests';
+            }
+        }
+
+        reportTitleElement.textContent = titleText;
+    }
+
     function printReport() {
         const printContent = document.getElementById('report-table').cloneNode(true);
 
         const printWindow = window.open('', '', 'height=600,width=800');
-        printWindow.document.write('<html><head><title>Borrow Management Report</title>');
+        const reportTitle = document.getElementById('report-title').textContent;
+        printWindow.document.write(`<html><head><title>${reportTitle}</title>`);
         printWindow.document.write('<style>');
         printWindow.document.write(`
             body {
@@ -373,7 +410,8 @@
             status: document.getElementById('status').value,
             program: document.getElementById('program').value,
             user_query: document.getElementById('user_query').value,
-            paper_query: document.getElementById('paper_query').value
+            paper_query: document.getElementById('paper_query').value,
+            report_title: document.getElementById('report-title').textContent
         };
 
         // Convert filters to URL parameters

@@ -31,7 +31,7 @@
                 {% for borrow in borrows %}
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">{{ borrow.paper.title }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ borrow.paper.title|upper }}</div>
                         <div class="text-xs text-gray-500">Requested: {{ borrow.request_date|date:"M d, Y" }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">

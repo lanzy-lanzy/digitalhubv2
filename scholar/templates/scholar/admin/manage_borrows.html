@@ -29,6 +29,10 @@
                    class="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium {% if status_filter == 'returned' %}bg-blue-50 border-blue-500 text-blue-700{% else %}border-gray-300 text-gray-700 bg-white hover:bg-gray-50{% endif %}">
                     Returned
                 </a>
+                <a href="?status=past_due"
+                   class="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium {% if status_filter == 'past_due' %}bg-red-50 border-red-500 text-red-700{% else %}border-gray-300 text-gray-700 bg-white hover:bg-gray-50{% endif %}">
+                    Past Due
+                </a>
             </div>
         </div>
     </div>
@@ -44,6 +48,7 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paper</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Borrow Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Return Date</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -59,10 +64,22 @@
                                         <div class="text-sm text-gray-900">{{ borrow.paper.title }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ borrow.borrow_date }}</div>
+                                        <div class="text-sm text-gray-900">{{ borrow.borrow_date|date:"M d, Y" }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ borrow.return_date|default:"-" }}</div>
+                                        {% if borrow.due_date %}
+                                            {% now "Y-m-d" as today_date %}
+                                            {% if borrow.due_date|date:"Y-m-d" < today_date and borrow.status == 'approved' and not borrow.is_returned %}
+                                                <div class="text-sm font-medium text-red-600">{{ borrow.due_date|date:"M d, Y" }} (Past Due)</div>
+                                            {% else %}
+                                                <div class="text-sm text-gray-900">{{ borrow.due_date|date:"M d, Y" }}</div>
+                                            {% endif %}
+                                        {% else %}
+                                            <div class="text-sm text-gray-500">-</div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">{{ borrow.return_date|date:"M d, Y"|default:"-" }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         {% if borrow.is_returned %}

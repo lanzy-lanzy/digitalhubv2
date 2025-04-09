@@ -77,6 +77,9 @@ def manage_borrows(request):
         borrows = borrows.filter(status='rejected')
     elif status_filter == 'returned':
         borrows = borrows.filter(is_returned=True)
+    elif status_filter == 'past_due':
+        now = timezone.now()
+        borrows = borrows.filter(status='approved', is_returned=False, due_date__lt=now)
 
     paginator = Paginator(borrows, 10)
     page_number = request.GET.get('page')

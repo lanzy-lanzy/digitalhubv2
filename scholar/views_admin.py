@@ -352,6 +352,9 @@ def admin_reports_api(request):
     if status:
         if status == 'unreturned':
             borrows = borrows.filter(status='approved', is_returned=False)
+        elif status == 'past_due':
+            now = timezone.now()
+            borrows = borrows.filter(status='approved', is_returned=False, due_date__lt=now)
         else:
             borrows = borrows.filter(status=status)
 
@@ -375,9 +378,18 @@ def admin_reports_api(request):
     rejected_borrows = borrows.filter(status='rejected').count()
     unreturned_borrows = borrows.filter(status='approved', is_returned=False).count()
 
+    # Calculate past due borrows (approved, not returned, and past due date)
+    now = timezone.now()
+    past_due_borrows = borrows.filter(status='approved', is_returned=False, due_date__lt=now).count()
+
     # Prepare borrow data
     borrow_data = []
     for borrow in borrows:
+        # Check if the borrow is past due
+        is_past_due = False
+        if borrow.status == 'approved' and not borrow.is_returned and borrow.due_date and borrow.due_date < now:
+            is_past_due = True
+
         borrow_data.append({
             'id': borrow.id,
             'user': {
@@ -392,6 +404,7 @@ def admin_reports_api(request):
             'request_date': borrow.request_date.strftime('%b %d, %Y %I:%M %p'),
             'status': borrow.status,
             'is_returned': borrow.is_returned,
+            'is_past_due': is_past_due,
             'program': borrow.user.student.program if hasattr(borrow.user, 'student') else ''
         })
 
@@ -402,7 +415,8 @@ def admin_reports_api(request):
             'approved': approved_borrows,
             'pending': pending_borrows,
             'rejected': rejected_borrows,
-            'unreturned': unreturned_borrows
+            'unreturned': unreturned_borrows,
+            'past_due': past_due_borrows
         },
         'borrows': borrow_data
     })

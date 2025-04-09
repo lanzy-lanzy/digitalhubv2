@@ -48,6 +48,7 @@
                     <option value="rejected">Rejected</option>
                     <option value="returned">Returned</option>
                     <option value="unreturned">Unreturned</option>
+                    <option value="past_due">Past Due</option>
                 </select>
             </div>
             <div>
@@ -152,6 +153,19 @@
                 </div>
             </div>
         </div>
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+            <div class="flex items-center">
+                <div class="p-3 bg-red-200 rounded-lg">
+                    <svg class="h-6 w-6 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm text-gray-600">Past Due</p>
+                    <h3 class="text-xl font-bold text-gray-900" id="past-due-requests">0</h3>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Action Buttons -->
@@ -226,6 +240,7 @@
                 document.getElementById('pending-requests').textContent = data.stats.pending;
                 document.getElementById('rejected-requests').textContent = data.stats.rejected;
                 document.getElementById('unreturned-requests').textContent = data.stats.unreturned || 0;
+                document.getElementById('past-due-requests').textContent = data.stats.past_due || 0;
 
                 // Clear existing table rows
                 const reportBody = document.getElementById('report-body');
@@ -234,10 +249,17 @@
                 // Populate table with data
                 data.borrows.forEach(borrow => {
                     const row = document.createElement('tr');
-                    // Determine the status to display (show 'Unreturned' for approved but not returned items)
+                    // Determine the status to display
                     let displayStatus = borrow.status;
+
+                    // Show 'Unreturned' for approved but not returned items
                     if (borrow.status === 'approved' && !borrow.is_returned) {
                         displayStatus = 'unreturned';
+                    }
+
+                    // Show 'Past Due' for items that are past their due date
+                    if (borrow.is_past_due) {
+                        displayStatus = 'past_due';
                     }
 
                     row.innerHTML = `
@@ -288,7 +310,8 @@
             'approved': 'bg-green-100 text-green-800',
             'rejected': 'bg-red-100 text-red-800',
             'returned': 'bg-blue-100 text-blue-800',
-            'unreturned': 'bg-purple-100 text-purple-800'
+            'unreturned': 'bg-purple-100 text-purple-800',
+            'past_due': 'bg-red-200 text-red-800 font-bold'
         };
         return statusClasses[status] || 'bg-gray-100 text-gray-800';
     }

@@ -48,7 +48,7 @@ def admin_dashboard(request):
 
 @staff_member_required
 def manage_papers(request):
-    papers = Paper.objects.all().order_by('-publication_date')
+    papers = Paper.objects.all().order_by('-created_at', '-publication_date')
     search_query = request.GET.get('search', '')
     if search_query:
         papers = papers.filter(
@@ -389,7 +389,7 @@ def admin_reports_api(request):
                 'title': borrow.paper.title,
                 'id': borrow.paper.id
             },
-            'request_date': borrow.request_date.strftime('%Y-%m-%d'),
+            'request_date': borrow.request_date.strftime('%b %d, %Y %I:%M %p'),
             'status': borrow.status,
             'is_returned': borrow.is_returned,
             'program': borrow.user.student.program if hasattr(borrow.user, 'student') else ''
@@ -601,7 +601,7 @@ def generate_pdf_report(request):
                 full_name,
                 borrow.paper.title,
                 program_name,
-                borrow.request_date.strftime('%Y-%m-%d'),
+                borrow.request_date.strftime('%b %d, %Y %I:%M %p'),
                 borrow.status.capitalize(),
                 "Yes" if borrow.is_returned else "No"
             ])

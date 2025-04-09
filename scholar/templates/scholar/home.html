@@ -256,7 +256,7 @@
                     <div class="flex items-center justify-between text-sm bg-emerald-50 p-2 rounded-md">
                         <span class="text-emerald-800">Program:
                             {% for code, name in program_choices %}
-                                {% if code == program %}{{ name }}{% endif %}
+                                {% if code == program %}{{ name|upper }}{% endif %}
                             {% endfor %}
                         </span>
                         <a href="?{% if query %}q={{ query }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="text-red-600 hover:text-red-800">
@@ -294,7 +294,7 @@
                                 <span class="ml-2">Program:
                                     <span class="font-medium text-emerald-700">
                                         {% for code, name in program_choices %}
-                                            {% if code == program %}{{ name }}{% endif %}
+                                            {% if code == program %}{{ name|upper }}{% endif %}
                                         {% endfor %}
                                     </span>
                                 </span>
@@ -341,10 +341,10 @@
                                     <h2 class="text-xl font-semibold text-gray-900 mb-2 leading-tight">
                                         {% if user.is_authenticated %}
                                             <a href="{% url 'paper_detail' paper.id %}" class="hover:text-emerald-600 transition-colors">
-                                                {{ paper.title }}
+                                                {{ paper.title|upper }}
                                             </a>
                                         {% else %}
-                                            {{ paper.title }}
+                                            {{ paper.title|upper }}
                                         {% endif %}
                                     </h2>
 
@@ -354,9 +354,9 @@
                                                 {% with total_authors=authors|length %}
                                                     {% for author in authors|slice:":3" %}
                                                         {% if not forloop.first %}, {% endif %}
-                                                        {{ author.name }}
+                                                        {{ author.name|upper }}
                                                         {% if author.userprofile.student %}
-                                                            <span class="text-gray-500">({{ author.userprofile.student.program }})</span>
+                                                            <span class="text-gray-500">({{ author.userprofile.student.program|upper }})</span>
                                                         {% endif %}
                                                     {% endfor %}
                                                     {% if total_authors > 3 %}
@@ -372,7 +372,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                                 </svg>
                                                 {% for code, name in program_choices %}
-                                                    {% if code == paper.program %}{{ name }}{% endif %}
+                                                    {% if code == paper.program %}{{ name|upper }}{% endif %}
                                                 {% endfor %}
                                             </span>
 

@@ -58,10 +58,10 @@
                             {% for borrow in page_obj %}
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ borrow.user.username }}</div>
+                                        <div class="text-sm font-medium text-gray-900">{{ borrow.user.get_full_name|default:borrow.user.username|upper }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-900">{{ borrow.paper.title }}</div>
+                                        <div class="text-sm text-gray-900">{{ borrow.paper.title|upper }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">{{ borrow.borrow_date|date:"M d, Y" }}</div>

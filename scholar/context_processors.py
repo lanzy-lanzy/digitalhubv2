@@ -1,4 +1,4 @@
-from .models import Borrow, UserProfile
+from .models import Borrow, UserProfile, Paper
 
 def admin_stats(request):
     """
@@ -22,5 +22,13 @@ def admin_stats(request):
             user__is_active=False
         ).count()
         context['pending_registrations_count'] = pending_registrations_count
+
+        # Add total papers count
+        total_papers = Paper.objects.count()
+        context['total_papers'] = total_papers
+
+        # Add active borrows count
+        active_borrows = Borrow.objects.filter(status='approved', is_returned=False).count()
+        context['active_borrows'] = active_borrows
 
     return context

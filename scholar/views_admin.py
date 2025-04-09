@@ -199,7 +199,7 @@ def paper_analytics(request, paper_id):
 @staff_member_required
 def author_analytics(request, author_id):
     author = get_object_or_404(Author, id=author_id)
-    papers = author.paper_set.all()
+    papers = author.papers.all()
     total_citations = Citation.objects.filter(paper__in=papers).count()
 
     context = {

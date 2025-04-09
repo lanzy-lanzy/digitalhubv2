@@ -9,9 +9,9 @@ class AuthorAdmin(admin.ModelAdmin):
     list_filter = ('affiliation',)
     search_fields = ('name', 'affiliation', 'email')
     ordering = ('name',)
-    
+
     def paper_count(self, obj):
-        return obj.paper_set.count()
+        return obj.papers.count()
     paper_count.short_description = 'Number of Papers'
 
 class BorrowInline(admin.TabularInline):
@@ -42,7 +42,7 @@ class PaperAdmin(admin.ModelAdmin):
             return format_html('<span style="color: green;">Available</span>')
         elif active_borrows >= obj.available_copies:
             return format_html('<span style="color: red;">All Copies Borrowed</span>')
-        return format_html('<span style="color: orange;">{} of {} Borrowed</span>', 
+        return format_html('<span style="color: orange;">{} of {} Borrowed</span>',
                          active_borrows, obj.available_copies)
     borrowing_status.short_description = 'Status'
 
@@ -73,7 +73,7 @@ class CitationAdmin(admin.ModelAdmin):
     list_filter = ('citation_date',)
     search_fields = ('paper__title', 'cited_by__title')
     date_hierarchy = 'citation_date'
-    
+
     def citation_age(self, obj):
         age = timezone.now().date() - obj.citation_date
         return f"{age.days} days"

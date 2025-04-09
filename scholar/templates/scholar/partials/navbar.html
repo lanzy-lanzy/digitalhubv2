@@ -1,20 +1,28 @@
-<nav class="bg-white border-b border-emerald-100 shadow-sm sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
-        <div class="flex justify-between h-20 items-center">
+<nav class="bg-white border-b border-emerald-100 shadow-md sticky top-0 z-50 transition-all duration-300" x-data="{ mobileMenuOpen: false, scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)" :class="{'shadow-lg bg-white/95 backdrop-blur-sm': scrolled}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center relative">
             <!-- Left side - Logo and main navigation -->
-            <div class="flex items-center space-x-8">
-                <!-- Logo -->
-                <a href="{% url 'home' %}" class="flex items-center group">
-                    <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white p-2.5 rounded-lg group-hover:from-emerald-700 group-hover:to-emerald-800 transition-all duration-200 shadow-md">
-                        <svg class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center space-x-4 sm:space-x-8">
+                <!-- Mobile menu button -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="sm:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500">
+                    <svg class="h-6 w-6" :class="{'hidden': mobileMenuOpen, 'block': !mobileMenuOpen }" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg class="h-6 w-6" :class="{'block': mobileMenuOpen, 'hidden': !mobileMenuOpen }" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+                <!-- Logo for mobile (left-aligned) -->
+                <a href="{% url 'home' %}" class="flex items-center group md:hidden">
+                    <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white p-2 rounded-lg group-hover:from-emerald-700 group-hover:to-emerald-800 transition-all duration-200 shadow-md">
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M21 5c0-1.1-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14zm-14 14v-14h14v14h-14zm12-3h-10v-2h10v2zm0-4h-10v-2h10v2zm0-4h-10v-2h10v2z"/>
                         </svg>
                     </div>
-                    <span class="ml-3.5 text-3xl font-bold bg-gradient-to-r from-emerald-900 to-emerald-700 bg-clip-text text-transparent">J.H. CSC</span>
                 </a>
 
                 <!-- Main Navigation -->
-                <div class="hidden sm:flex sm:items-center sm:space-x-4">
+                <div class="hidden sm:flex sm:items-center sm:space-x-2 md:space-x-4">
                     {% if user.is_authenticated and not user.is_staff %}
                         <a href="{% url 'my_borrowed_papers' %}"
                            class="nav-link inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-150 {% if 'my_borrowed_papers' in request.path %}text-emerald-700 bg-emerald-50 hover:bg-emerald-100{% else %}text-gray-700 hover:text-gray-900 hover:bg-emerald-50{% endif %}">
@@ -26,7 +34,7 @@
                     {% endif %}
                 </div>
 
-                <div class="hidden sm:flex sm:items-center sm:space-x-4">
+                <div class="hidden sm:flex sm:items-center sm:space-x-2 md:space-x-4">
                     {% if user.is_authenticated and not user.is_staff %}
                     <a href="{% url 'my_bookmarked_papers' %}"
                            class="nav-link inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-150 {% if 'my_bookmarks' in request.path %}text-emerald-700 bg-emerald-50 hover:bg-emerald-100{% else %}text-gray-700 hover:text-gray-900 hover:bg-emerald-50{% endif %}">
@@ -38,8 +46,50 @@
                     {% endif %}
                 </div>            </div>
 
+            <!-- Mobile Menu -->
+            <div x-show="mobileMenuOpen" class="sm:hidden absolute top-20 inset-x-0 bg-white shadow-lg rounded-b-lg z-50 border-t border-emerald-100">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    {% if user.is_authenticated and not user.is_staff %}
+                    <a href="{% url 'my_borrowed_papers' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if 'my_borrowed_papers' in request.path %}text-emerald-700 bg-emerald-50{% else %}text-gray-700 hover:text-gray-900 hover:bg-emerald-50{% endif %}">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+                            </svg>
+                            My Library
+                        </div>
+                    </a>
+                    <a href="{% url 'my_bookmarked_papers' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if 'my_bookmarks' in request.path %}text-emerald-700 bg-emerald-50{% else %}text-gray-700 hover:text-gray-900 hover:bg-emerald-50{% endif %}">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                            </svg>
+                            My Bookmarks
+                        </div>
+                    </a>
+                    {% endif %}
+
+                    {% if user.is_staff %}
+                    <a href="{% url 'admin_dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium {% if request.path == '/admin/dashboard/' %}text-emerald-700 bg-emerald-50{% else %}text-gray-700 hover:text-gray-900 hover:bg-emerald-50{% endif %}">
+                        <div class="flex items-center">
+                            <svg class="mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V4zM8 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H9a1 1 0 01-1-1V4zM15 3a1 1 0 00-1 1v12a1 1 0 001 1h2a1 1 0 001-1V4a1 1 0 00-1-1h-2z" />
+                            </svg>
+                            Admin Dashboard
+                        </div>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Centered Logo and Title (hidden on mobile) -->
+            <div class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center">
+                <a href="{% url 'home' %}" class="flex items-center group">
+                    <span class="ml-3.5 text-3xl font-bold bg-gradient-to-r from-emerald-900 to-emerald-700 bg-clip-text text-transparent">J.H.CSC Digital Research Hub</span>
+                </a>
+            </div>
+
             <!-- Right side - Admin Nav and User Menu -->
-            <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-4 sm:space-x-6">
                 <!-- Admin Navigation -->
                 {% if user.is_staff %}
                     {% include 'scholar/partials/admin_nav.html' %}
@@ -48,7 +98,7 @@
                 <!-- User Menu -->
                 {% if user.is_authenticated %}
     <!-- User Profile Dropdown -->
-    <div class="relative z-50" x-data="{ open: false }">
+    <div class="relative z-[100]" x-data="{ open: false }">
         <!-- Profile Button -->
         <button @click="open = !open"
                 class="flex items-center space-x-3 group focus:outline-none rounded-lg p-1.5 transition-all duration-200 hover:bg-emerald-50"
@@ -79,7 +129,7 @@
         <!-- Profile Dropdown Menu -->
         <div x-show="open"
              @click.away="open = false"
-             class="absolute right-0 mt-3 w-64 rounded-xl bg-white shadow-xl ring-1 ring-emerald-500/10 ring-opacity-5 divide-y divide-gray-100 transform origin-top-right transition-all duration-200"
+             class="absolute right-0 mt-3 w-64 rounded-xl bg-white shadow-xl ring-1 ring-emerald-500/10 ring-opacity-5 divide-y divide-gray-100 transform origin-top-right transition-all duration-200 z-[100]"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100"

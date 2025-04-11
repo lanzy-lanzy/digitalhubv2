@@ -85,6 +85,7 @@ class Paper(models.Model):
         choices=Student.PROGRAM_CHOICES,
         default='BSIT'  # Setting default value to BSIT
     )
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.title

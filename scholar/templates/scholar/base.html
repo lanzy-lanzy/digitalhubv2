@@ -8,17 +8,35 @@
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Poppins', 'system-ui', 'sans-serif'],
+                        'body': ['Roboto', 'system-ui', 'sans-serif'],
+                    },
+                    fontSize: {
+                        'base': '1.05rem',
+                        'lg': '1.15rem',
+                        'xl': '1.25rem',
+                        '2xl': '1.5rem',
+                        '3xl': '1.875rem',
+                        '4xl': '2.25rem',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-emerald-50">
+<body class="bg-emerald-50 font-sans text-base">
     <div class="fixed inset-0 pattern-background pointer-events-none"></div>
-    <div class="relative">
-        {% include 'scholar/partials/navbar.html' %}
-    </div>
+    {% include 'scholar/partials/navbar.html' %}
 
     <!-- Main Content -->
-    <main class="relative max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="content-background rounded-xl shadow-sm p-6">
+    <main class="relative max-w-full mx-auto py-8 px-4 sm:px-6 lg:px-10">
+        <div class="content-background rounded-xl shadow-sm p-8">
             {% if messages %}
                 {% for message in messages %}
                     <div class="mb-4 rounded-md p-4 {% if message.tags == 'success' %}bg-green-50 text-green-800{% elif message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}">

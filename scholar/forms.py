@@ -2,24 +2,45 @@ from django import forms
 from .models import Paper, Author, Student, UserProfile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from datetime import date
+
+
+class YearField(forms.Field):
+    """Custom form field for year input"""
+    widget = forms.TextInput
+
+    def to_python(self, value):
+        if not value:
+            return None
+        try:
+            year = int(value)
+            if 1900 <= year <= 2100:
+                return date(year=year, month=1, day=1)
+            else:
+                raise forms.ValidationError("Year must be between 1900 and 2100")
+        except (ValueError, TypeError):
+            raise forms.ValidationError("Please enter a valid year")
 
 class PaperUploadForm(forms.ModelForm):
     authors = forms.CharField(
         help_text="Enter author names separated by commas",
-        widget=forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'})
+        widget=forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'})
     )
     pdf_file = forms.FileField(
-        widget=forms.FileInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'})
+        widget=forms.FileInput(attrs={'class': 'mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-2 px-3 transition-colors duration-150 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-base file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'})
+    )
+    publication_date = YearField(
+        widget=forms.TextInput(attrs={'type': 'text', 'pattern': '[0-9]{4}', 'maxlength': '4', 'placeholder': 'Enter year (e.g., 2024)', 'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'}),
+        label='Year Released'
     )
 
     class Meta:
         model = Paper
         fields = ['title', 'abstract', 'publication_date', 'pdf_file', 'program', 'authors']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'}),
-            'abstract': forms.Textarea(attrs={'rows': 4, 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'}),
-            'publication_date': forms.DateInput(attrs={'type': 'date', 'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'}),
-            'program': forms.Select(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500'})
+            'title': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'}),
+            'abstract': forms.Textarea(attrs={'rows': 5, 'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'}),
+            'program': forms.Select(attrs={'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'})
         }
 
     def clean_authors(self):
@@ -44,6 +65,8 @@ class PaperUploadForm(forms.ModelForm):
             paper.save()
             # Handle authors
             author_names = self.cleaned_data['authors']
+            # Clear existing authors to avoid duplicates when editing
+            paper.authors.clear()
             for name in author_names:
                 author, _ = Author.objects.get_or_create(name=name)
                 paper.authors.add(author)

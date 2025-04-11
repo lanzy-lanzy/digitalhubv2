@@ -284,7 +284,7 @@
                             <div class="ml-3 flex-1">
                                 <p class="text-sm font-medium text-gray-900 hover:text-blue-600 line-clamp-1">{{ paper.title }}</p>
                                 <div class="flex items-center mt-1">
-                                    <span class="text-xs text-gray-500">Published: {{ paper.publication_date|date:"M d, Y" }}</span>
+                                    <span class="text-xs text-gray-500">Year Released: {{ paper.publication_date|date:"Y" }}</span>
                                     {% if paper.authors.all %}
                                     <span class="mx-1 text-gray-300">•</span>
                                     <span class="text-xs text-gray-500">By:
@@ -397,7 +397,7 @@
                             <div class="ml-3 flex-1">
                                 <p class="text-sm font-medium text-gray-900 hover:text-purple-600 line-clamp-1">{{ paper.title }}</p>
                                 <div class="flex items-center mt-1">
-                                    <span class="text-xs text-gray-500">Published: {{ paper.publication_date|date:"M d, Y" }}</span>
+                                    <span class="text-xs text-gray-500">Year Released: {{ paper.publication_date|date:"Y" }}</span>
                                 </div>
                             </div>
                         </div>

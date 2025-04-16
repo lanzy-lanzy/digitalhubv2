@@ -25,4 +25,9 @@ urlpatterns = [
     path('login/', include('django.contrib.auth.urls')),  # Default Django auth URLs
     path('accounts/', include('scholar.urls')),  # Your custom URLs
     path('', home, name='home'),  # Map the root URL to the home view
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+# Add static and media URL patterns for development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

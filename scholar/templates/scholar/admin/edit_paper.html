@@ -22,31 +22,133 @@
         <div class="px-4 py-5 sm:p-6">
             <form method="post" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
-                {% for field in form %}
-                    <div>
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                            {{ field.label }}
-                        </label>
-                        <div class="mt-1">
-                            {{ field }}
-                        </div>
-                        {% if field.help_text %}
-                            <p class="mt-2 text-sm text-gray-500">{{ field.help_text|safe }}</p>
-                        {% endif %}
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                                <p class="mt-2 text-sm text-red-600">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
+
+                <!-- Title -->
+                <div>
+                    <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.title.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.title }}
                     </div>
-                {% endfor %}
-                
+                    {% if form.title.errors %}
+                        {% for error in form.title.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Abstract -->
+                <div>
+                    <label for="{{ form.abstract.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.abstract.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.abstract }}
+                    </div>
+                    {% if form.abstract.errors %}
+                        {% for error in form.abstract.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Year Released (Publication Date) -->
+                <div>
+                    <label for="{{ form.publication_date.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Year Released
+                    </label>
+                    <div class="mt-1">
+                        {{ form.publication_date }}
+                    </div>
+                    {% if form.publication_date.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ form.publication_date.help_text|safe }}</p>
+                    {% endif %}
+                    {% if form.publication_date.errors %}
+                        {% for error in form.publication_date.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- PDF File -->
+                <div>
+                    <label for="{{ form.pdf_file.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.pdf_file.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.pdf_file }}
+                    </div>
+                    {% if form.pdf_file.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ form.pdf_file.help_text|safe }}</p>
+                    {% endif %}
+                    {% if form.pdf_file.errors %}
+                        {% for error in form.pdf_file.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Program -->
+                <div>
+                    <label for="{{ form.program.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.program.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.program }}
+                    </div>
+                    {% if form.program.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ form.program.help_text|safe }}</p>
+                    {% endif %}
+                    {% if form.program.errors %}
+                        {% for error in form.program.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Authors -->
+                <div>
+                    <label for="{{ form.authors.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.authors.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.authors }}
+                    </div>
+                    {% if form.authors.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ form.authors.help_text|safe }}</p>
+                    {% endif %}
+                    {% if form.authors.errors %}
+                        {% for error in form.authors.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Keywords -->
+                <div>
+                    <label for="{{ form.keywords.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        {{ form.keywords.label }}
+                    </label>
+                    <div class="mt-1">
+                        {{ form.keywords }}
+                    </div>
+                    {% if form.keywords.help_text %}
+                        <p class="mt-2 text-sm text-gray-500">{{ form.keywords.help_text|safe }}</p>
+                    {% endif %}
+                    {% if form.keywords.errors %}
+                        {% for error in form.keywords.errors %}
+                            <p class="mt-2 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
                 <div class="flex justify-end space-x-3">
-                    <a href="{% url 'manage_papers' %}" 
+                    <a href="{% url 'manage_papers' %}"
                        class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Cancel
                     </a>
-                    <button type="submit" 
+                    <button type="submit"
                             class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         Save Changes
                     </button>

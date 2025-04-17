@@ -99,6 +99,14 @@
                                     <span class="text-base font-medium text-gray-600 uppercase tracking-wider">Year Released</span>
                                 </th>
                                 <th scope="col" class="px-8 py-4 text-left w-1/6">
+                                    <div class="flex items-center space-x-2 text-base font-medium text-gray-600 uppercase tracking-wider">
+                                        <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span>Keywords</span>
+                                    </div>
+                                </th>
+                                <th scope="col" class="px-8 py-4 text-left w-1/6">
                                     <span class="text-base font-medium text-gray-600 uppercase tracking-wider">Date Added</span>
                                 </th>
                                 <th scope="col" class="px-8 py-4 text-left w-1/6">
@@ -154,6 +162,20 @@
                                             PDF
                                         </div>
                                         {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <div class="flex flex-wrap gap-1.5 max-w-xs">
+                                        {% for keyword in paper.get_keywords_list %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-md text-base font-medium bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
+                                            <svg class="w-4 h-4 mr-1.5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                            </svg>
+                                            {{ keyword|upper }}
+                                        </span>
+                                        {% empty %}
+                                        <span class="text-gray-500 italic">No keywords</span>
+                                        {% endfor %}
                                     </div>
                                 </td>
                                 <td class="px-8 py-5 whitespace-nowrap">

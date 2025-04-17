@@ -34,13 +34,20 @@ class PaperUploadForm(forms.ModelForm):
         label='Year Released'
     )
 
+    keywords = forms.CharField(
+        required=False,
+        help_text="Enter keywords separated by commas (e.g., AI, Machine Learning, Data Science)",
+        widget=forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'})
+    )
+
     class Meta:
         model = Paper
-        fields = ['title', 'abstract', 'publication_date', 'pdf_file', 'program', 'authors']
+        fields = ['title', 'abstract', 'publication_date', 'pdf_file', 'program', 'authors', 'keywords']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'}),
             'abstract': forms.Textarea(attrs={'rows': 5, 'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'}),
-            'program': forms.Select(attrs={'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'})
+            'program': forms.Select(attrs={'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150'}),
+            'keywords': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-3 px-4 transition-colors duration-150', 'placeholder': 'e.g., AI, Machine Learning, Data Science'})
         }
 
     def clean_authors(self):

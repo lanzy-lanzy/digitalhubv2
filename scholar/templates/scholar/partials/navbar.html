@@ -1,7 +1,7 @@
 {% load static %}
 <nav class="bg-white border-b border-emerald-100 shadow-md sticky top-0 z-50 transition-all duration-300" x-data="{ mobileMenuOpen: false, scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)" :class="{'shadow-lg bg-white/95 backdrop-blur-sm': scrolled}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-20 items-center relative">
+        <div class="flex justify-between h-20 items-center relative gap-2 md:gap-4">
             <!-- Left side - Logo and main navigation -->
             <div class="flex items-center space-x-4 sm:space-x-8">
                 <!-- Mobile menu button -->
@@ -79,15 +79,15 @@
             </div>
 
             <!-- Centered Logo and Title (hidden on mobile) -->
-            <div class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center justify-center">
+            <div class="hidden md:flex items-center justify-center mx-auto max-w-xl lg:max-w-2xl px-4 overflow-hidden">
                 <a href="{% url 'home' %}" class="flex items-center group">
                     <img src="/static/images/jh-logo.png" alt="JH CSC Logo" class="h-12 w-auto mr-3">
-                    <span class="text-4xl font-bold bg-gradient-to-r from-emerald-900 to-emerald-700 bg-clip-text text-transparent">J.H CSC Digital Research Hub</span>
+                    <span class="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-900 to-emerald-700 bg-clip-text text-transparent truncate">J.H CSC Digital Research Hub</span>
                 </a>
             </div>
 
             <!-- Right side - Admin Nav and User Menu -->
-            <div class="flex items-center space-x-4 sm:space-x-6 ml-auto">
+            <div class="flex items-center space-x-4 sm:space-x-6 ml-auto shrink-0">
                 <!-- Sign In and Create Account Buttons -->
                 {% if not user.is_authenticated %}
                 <div class="flex items-center space-x-4">
@@ -103,6 +103,71 @@
                         </svg>
                         Create Account
                     </a>
+                </div>
+                {% endif %}
+
+                <!-- Notification Bell for Regular Users -->
+                {% if user.is_authenticated and not user.is_staff and recent_approved_borrows %}
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="relative p-2 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        {% if unread_notifications_count > 0 %}
+                        <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">{{ unread_notifications_count }}</span>
+                        {% endif %}
+                    </button>
+
+                    <!-- Notification Dropdown -->
+                    <div x-show="open"
+                         @click.away="open = false"
+                         class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 scale-100"
+                         x-transition:leave-end="opacity-0 scale-95">
+                        <div class="p-3 border-b border-gray-200 bg-emerald-50 flex justify-between items-center">
+                            <h3 class="text-sm font-semibold text-gray-700">Recent Notifications</h3>
+                            {% if unread_notifications_count > 0 %}
+                            <form method="post" action="{% url 'mark_notifications_read' %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="text-xs font-medium text-emerald-600 hover:text-emerald-800">
+                                    Mark all as read
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            {% for borrow in recent_approved_borrows %}
+                            <a href="{% url 'mark_notification_read' borrow.id %}" class="block px-4 py-3 hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100 last:border-b-0 {% if not borrow.notification_read %}bg-blue-50{% endif %}">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0 {% if not borrow.notification_read %}bg-blue-100{% else %}bg-emerald-100{% endif %} rounded-full p-2">
+                                        <svg class="h-5 w-5 {% if not borrow.notification_read %}text-blue-600{% else %}text-emerald-600{% endif %}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900">Borrow Request Approved</p>
+                                        <p class="text-sm text-gray-600 truncate">Your request to borrow "{{ borrow.paper.title }}" has been approved.</p>
+                                        <p class="text-xs text-gray-500 mt-1">Due date: {{ borrow.due_date|date:"M d, Y" }}</p>
+                                    </div>
+                                    {% if not borrow.notification_read %}
+                                    <div class="ml-auto">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                            New
+                                        </span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <div class="p-2 bg-gray-50 border-t border-gray-100 text-center rounded-b-lg">
+                            <a href="{% url 'my_borrowed_papers' %}" class="text-xs font-medium text-emerald-600 hover:text-emerald-800">View All Borrowed Papers</a>
+                        </div>
+                    </div>
                 </div>
                 {% endif %}
 

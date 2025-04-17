@@ -1,4 +1,6 @@
 from .models import Borrow, UserProfile, Paper
+from django.utils import timezone
+from datetime import timedelta
 
 def admin_stats(request):
     """
@@ -30,5 +32,23 @@ def admin_stats(request):
         # Add active borrows count
         active_borrows = Borrow.objects.filter(status='approved', is_returned=False).count()
         context['active_borrows'] = active_borrows
+
+    # For regular users, check for recently approved borrow requests
+    if request.user.is_authenticated and not request.user.is_staff:
+        # Get recently approved borrow requests (within the last 7 days)
+        recent_time = timezone.now() - timedelta(days=7)
+
+        # Get all recent approved borrows
+        recent_approved_borrows = Borrow.objects.filter(
+            user=request.user,
+            status='approved',
+            borrow_date__gte=recent_time
+        ).order_by('-borrow_date')
+
+        # Get only unread notifications
+        unread_notifications = recent_approved_borrows.filter(notification_read=False)
+
+        context['recent_approved_borrows'] = recent_approved_borrows
+        context['unread_notifications_count'] = unread_notifications.count()
 
     return context

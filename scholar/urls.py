@@ -5,7 +5,8 @@ from .views import (
     RegisterView, admin_pending_registrations, approve_registration, reject_registration,
     request_return, approve_return, reject_return, admin_return_requests,
     user_login, profile, settings, edit_profile, bookmark_paper,
-    unbookmark_paper, my_bookmarked_papers, view_borrow
+    unbookmark_paper, my_bookmarked_papers, view_borrow,
+    mark_notification_read, mark_notifications_read
 )
 
 urlpatterns = [
@@ -55,6 +56,10 @@ urlpatterns = [
     path('api/admin/reports/', views_admin.admin_reports_api, name='admin_reports_api'),
     path('admin/reports/pdf/', views_admin.generate_pdf_report, name='generate_pdf_report'),
     path('admin/borrows/<int:borrow_id>/', view_borrow, name='view_borrow'),
+
+    # Notification URLs
+    path('notifications/mark-read/<int:borrow_id>/', mark_notification_read, name='mark_notification_read'),
+    path('notifications/mark-all-read/', mark_notifications_read, name='mark_notifications_read'),
 ]
 
 

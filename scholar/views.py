@@ -8,7 +8,7 @@ from .forms import StudentRegistrationForm
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from datetime import timedelta, datetime
 from django.utils import timezone
 from .forms import ReservationForm, BorrowForm
@@ -754,3 +754,46 @@ def paper_analytics(request, paper_id):
         'active_borrows': borrow_history.filter(is_returned=False).count(),
     }
     return render(request, 'scholar/admin/paper_analytics.html', context)
+
+
+@login_required
+def mark_notification_read(request, borrow_id):
+    """
+    Mark a specific notification as read and redirect to the borrow details page
+    """
+    borrow = get_object_or_404(Borrow, id=borrow_id, user=request.user)
+
+    # Mark the notification as read
+    if not borrow.notification_read:
+        borrow.notification_read = True
+        borrow.save()
+
+    # Redirect to the borrow details page
+    return redirect('view_borrow', borrow_id=borrow.id)
+
+
+@login_required
+def mark_notifications_read(request):
+    """
+    Mark all notifications as read and redirect back to the previous page
+    """
+    if request.method == 'POST':
+        # Get all unread notifications for the current user
+        recent_time = timezone.now() - timedelta(days=7)
+        unread_notifications = Borrow.objects.filter(
+            user=request.user,
+            status='approved',
+            borrow_date__gte=recent_time,
+            notification_read=False
+        )
+
+        # Mark all as read
+        unread_notifications.update(notification_read=True)
+
+        messages.success(request, 'All notifications marked as read.')
+
+    # Redirect back to the previous page or home
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return HttpResponseRedirect(referer)
+    return redirect('home')

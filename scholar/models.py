@@ -85,10 +85,17 @@ class Paper(models.Model):
         choices=Student.PROGRAM_CHOICES,
         default='BSIT'  # Setting default value to BSIT
     )
+    keywords = models.CharField(max_length=255, blank=True, help_text='Comma-separated keywords')
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.title
+
+    def get_keywords_list(self):
+        """Return keywords as a list of strings"""
+        if not self.keywords:
+            return []
+        return [keyword.strip() for keyword in self.keywords.split(',')]
 class Borrow(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending Approval'),
@@ -113,6 +120,7 @@ class Borrow(models.Model):
     due_date = models.DateTimeField(null=True, blank=True)
     borrow_reason = models.TextField(blank=True, null=True, help_text='Reason for borrowing this paper')
     request_date = models.DateTimeField(default=timezone.now)
+    notification_read = models.BooleanField(default=False, help_text='Whether the approval notification has been read')
 
     class Meta:
         ordering = ['-borrow_date']

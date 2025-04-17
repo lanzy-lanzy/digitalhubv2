@@ -95,7 +95,16 @@ def admin_borrow_requests(request):
     Displays all pending borrow requests for admin approval.
     """
     borrow_requests = Borrow.objects.filter(status='pending').order_by('-request_date')
-    return render(request, 'scholar/admin/borrow_requests.html', {'borrow_requests': borrow_requests})
+
+    # Add pagination
+    paginator = Paginator(borrow_requests, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'scholar/admin/borrow_requests.html', {
+        'borrow_requests': page_obj,
+        'page_obj': page_obj
+    })
 
 @staff_member_required
 def approve_borrow(request, borrow_id):
@@ -115,8 +124,9 @@ def approve_borrow(request, borrow_id):
         # Set due date to 7 days from now
         borrow.due_date = current_time + timedelta(days=7)
 
-        # Update status to approved
+        # Update status to approved and ensure notification is unread
         borrow.status = 'approved'
+        borrow.notification_read = False
         borrow.save()
 
         messages.success(request, f'Borrow request approved. Borrowing starts today and due date set to {borrow.due_date.date()}.')

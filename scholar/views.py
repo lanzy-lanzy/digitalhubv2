@@ -89,12 +89,24 @@ def home(request):
     }
 
     return render(request, 'scholar/home.html', context)
-@xframe_options_exempt
+from django.views.decorators.clickjacking import xframe_options_deny
+from django.http import HttpResponseForbidden
+from datetime import datetime
+
+@xframe_options_deny  # Prevent embedding in iframes for security
 def paper_detail(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)
-    print(f"PDF File: {paper.pdf_file}")  # Debug statement
     session_key = f'viewed_paper_{paper_id}'
 
+    # Security checks
+    # 1. Check if user is allowed to view this paper
+    if not is_user_allowed_to_view(request, paper):
+        return HttpResponseForbidden("You don't have permission to view this document.")
+
+    # 2. Log the access for security auditing
+    log_document_access(request, paper)
+
+    # Update view count if this is a new view
     if not request.session.get(session_key, False):
         paper.view_count += 1
         if request.user.is_authenticated:
@@ -111,10 +123,64 @@ def paper_detail(request, paper_id):
             is_returned=False
         ).values_list('paper_id', flat=True)
 
+    # Add security context variables
+    security_context = {
+        'access_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'user_ip': get_client_ip(request),
+        'session_id': request.session.session_key or 'no-session',
+    }
+
     return render(request, 'scholar/paper_detail.html', {
         'paper': paper,
         'user_borrowed_papers': user_borrowed_papers,
+        'security_context': security_context,
     })
+
+# Helper functions for document security
+def is_user_allowed_to_view(request, paper):
+    """Check if the user is allowed to view this paper"""
+    # If the paper has no restrictions, allow access
+    if paper.available_copies > 0:
+        return True
+
+    # If user is staff, always allow access
+    if request.user.is_authenticated and request.user.is_staff:
+        return True
+
+    # Check if user has borrowed this paper
+    if request.user.is_authenticated:
+        has_borrowed = Borrow.objects.filter(
+            user=request.user,
+            paper=paper,
+            status='approved',
+            is_returned=False
+        ).exists()
+        if has_borrowed:
+            return True
+
+    # For restricted papers with no copies, only allow if borrowed
+    if paper.available_copies <= 0:
+        return request.user.is_authenticated and has_borrowed
+
+    return True
+
+def log_document_access(request, paper):
+    """Log document access for security auditing"""
+    # In a production environment, you would log this to a database or file
+    # For now, we'll just print to the console
+    user_info = request.user.username if request.user.is_authenticated else 'Anonymous'
+    ip_address = get_client_ip(request)
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    print(f"[DOCUMENT ACCESS LOG] {timestamp} - User: {user_info} - IP: {ip_address} - Paper: {paper.id} - {paper.title}")
+
+def get_client_ip(request):
+    """Get the client IP address from the request"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 
 

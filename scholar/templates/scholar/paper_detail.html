@@ -73,19 +73,94 @@
         <p class="mt-2 text-gray-700 no-copy text-justify">{{ paper.abstract }}</p>
     </div>
 
-    <!-- PDF Viewer Section -->
+    <!-- PDF Viewer Section with Anti-Screenshot Measures -->
     {% if paper.pdf_file.name %}
-    <div class="pdf-container">
-        <div id="pdf-pages"></div>
+    <div class="pdf-container no-copy" id="secure-pdf-container">
+        <div class="watermark-container">
+            {% if user.is_authenticated %}
+            <div class="watermark">{{ user.username }} - {{ user.email }} - {{ security_context.user_ip }} - {{ security_context.access_time }} - Session: {{ security_context.session_id|slice:":8" }}</div>
+            {% else %}
+            <div class="watermark">Guest - {{ security_context.user_ip }} - {{ security_context.access_time }} - Session: {{ security_context.session_id|slice:":8" }}</div>
+            {% endif %}
+        </div>
+        <div id="pdf-pages" class="pdf-content"></div>
+        <div class="security-overlay" id="security-overlay"></div>
     </div>
+
+    <!-- Security Warning -->
+    <div class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-yellow-700">
+                    This document is protected. Unauthorized reproduction, screenshots, or distribution is prohibited and may be subject to legal action.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Include PDF.js Library and the script for rendering pages -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Anti-screenshot measures
+            const secureContainer = document.getElementById('secure-pdf-container');
+            const securityOverlay = document.getElementById('security-overlay');
+
+            // Disable right-click
+            secureContainer.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                alert('Right-clicking is disabled for document security.');
+                return false;
+            });
+
+            // Disable keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Prevent print screen, Ctrl+P, Ctrl+S, etc.
+                if (
+                    (e.keyCode === 44) || // Print Screen
+                    (e.ctrlKey && e.keyCode === 80) || // Ctrl+P
+                    (e.ctrlKey && e.keyCode === 83) || // Ctrl+S
+                    (e.ctrlKey && e.keyCode === 85) || // Ctrl+U
+                    (e.ctrlKey && e.keyCode === 73) || // Ctrl+I
+                    (e.ctrlKey && e.shiftKey && e.keyCode === 73) // Ctrl+Shift+I
+                ) {
+                    e.preventDefault();
+                    alert('This keyboard shortcut is disabled for document security.');
+                    return false;
+                }
+            });
+
+            // Generate visual noise pattern for the overlay
+            function generateNoisePattern() {
+                const pattern = document.createElement('div');
+                pattern.classList.add('noise-pattern');
+
+                // Create a grid of tiny dots with random opacity
+                for (let i = 0; i < 1000; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('noise-dot');
+                    dot.style.left = `${Math.random() * 100}%`;
+                    dot.style.top = `${Math.random() * 100}%`;
+                    dot.style.opacity = Math.random() * 0.2;
+                    pattern.appendChild(dot);
+                }
+
+                securityOverlay.appendChild(pattern);
+            }
+
+            generateNoisePattern();
+
+            // PDF.js initialization
             pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
             const pdfUrl = "{{ paper.pdf_file.url }}";
             let pdfDoc = null;
             const pdfContainer = document.getElementById("pdf-pages");
+
             pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
                 pdfDoc = pdf;
                 for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
@@ -94,21 +169,183 @@
             }).catch(error => {
                 console.error("Error loading PDF:", error);
             });
+
             function renderPage(num) {
                 pdfDoc.getPage(num).then(page => {
                     let viewport = page.getViewport({ scale: 1.5 });
                     let canvas = document.createElement("canvas");
-                    canvas.classList.add("mb-4", "shadow-md", "rounded-lg");
+                    canvas.classList.add("mb-4", "shadow-md", "rounded-lg", "pdf-page");
                     pdfContainer.appendChild(canvas);
                     let context = canvas.getContext("2d");
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
+
                     let renderContext = {
                         canvasContext: context,
                         viewport: viewport
                     };
-                    page.render(renderContext);
+
+                    page.render(renderContext).promise.then(() => {
+                        // Add watermark to each page after rendering
+                        addWatermark(context, canvas.width, canvas.height, num);
+                    });
                 });
+            }
+
+            function addWatermark(ctx, width, height, pageNum) {
+                ctx.save();
+                ctx.globalAlpha = 0.15; // Watermark transparency
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#888888';
+                ctx.textAlign = 'center';
+
+                // User info watermark
+                const watermarkText = {% if user.is_authenticated %}'{{ user.username }} - {{ security_context.user_ip }} - {{ security_context.access_time }} - Page ' + pageNum{% else %}'Guest - {{ security_context.user_ip }} - {{ security_context.access_time }} - Page ' + pageNum{% endif %};
+
+                // Draw diagonal watermarks across the page
+                ctx.translate(width/2, height/2);
+                ctx.rotate(-Math.PI/6); // Rotate 30 degrees
+
+                // Draw multiple watermarks
+                for (let i = -height; i < height*2; i += 100) {
+                    for (let j = -width; j < width*2; j += 300) {
+                        ctx.fillText(watermarkText, j, i);
+                    }
+                }
+
+                ctx.restore();
+            }
+        });
+    </script>
+
+    <style>
+        /* Anti-screenshot styles */
+        .watermark-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 24px;
+            color: rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .security-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.02;
+        }
+
+        .noise-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .noise-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: #000;
+            border-radius: 50%;
+        }
+
+        .pdf-page {
+            position: relative;
+            z-index: 5;
+        }
+
+        .pdf-content {
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Make content non-selectable */
+        .no-copy {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Anti-screenshot blinking overlay */
+        @keyframes blink-overlay {
+            0% { opacity: 0; }
+            49% { opacity: 0; }
+            50% { opacity: 0.03; }
+            51% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        #secure-pdf-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(0, 0, 0, 0.05),
+                rgba(0, 0, 0, 0.05) 10px,
+                rgba(0, 0, 0, 0) 10px,
+                rgba(0, 0, 0, 0) 20px
+            );
+            animation: blink-overlay 0.3s infinite;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Prevent printing */
+        @media print {
+            #secure-pdf-container {
+                display: none !important;
+            }
+            body::after {
+                content: "Printing is disabled for this document.";
+                display: block;
+                text-align: center;
+                font-size: 24px;
+                margin-top: 100px;
+            }
+        }
+    </style>
+
+    <!-- Additional anti-screenshot script -->
+    <script>
+        // Detect screenshot attempts using the Page Visibility API
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                // This might be a screenshot attempt or tab switch
+                console.log('Possible screenshot attempt detected');
+                // You could log this event or take other actions
+            }
+        });
+
+        // Disable drag and drop
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.nodeName === 'IMG' || e.target.nodeName === 'CANVAS') {
+                e.preventDefault();
+                return false;
             }
         });
     </script>

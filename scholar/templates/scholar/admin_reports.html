@@ -198,8 +198,8 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paper</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Date/Time</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status/Details</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                     </tr>
                 </thead>
@@ -224,6 +224,12 @@
 
         // Update report title based on selected status
         updateReportTitle(filters.status);
+
+        // Special handling for returned status
+        if (filters.status === 'returned') {
+            // Add is_returned=true to the filters
+            filters.is_returned = 'true';
+        }
 
         // Convert filters to URL parameters
         const params = new URLSearchParams(filters);
@@ -252,17 +258,60 @@
                 // Populate table with data
                 data.borrows.forEach(borrow => {
                     const row = document.createElement('tr');
+
+                    // Process date and time information
+                    let requestDate = borrow.request_date || '';
+                    let requestTime = '';
+                    let returnDate = '';
+
+                    // If request_date includes time information, extract it
+                    if (requestDate.includes(' ')) {
+                        const parts = requestDate.split(' ');
+                        requestDate = parts[0];
+                        requestTime = parts[1];
+                    } else if (borrow.request_time) {
+                        // If request_time is provided separately
+                        requestTime = borrow.request_time;
+                    }
+
+                    // Process return date if available
+                    if (borrow.return_date) {
+                        returnDate = borrow.return_date;
+                        // If return_date includes time, extract just the date part
+                        if (returnDate.includes(' ')) {
+                            returnDate = returnDate.split(' ')[0];
+                        }
+                    }
+
                     // Determine the status to display
                     let displayStatus = borrow.status;
 
+                    // Show 'Returned' for approved items that have been returned
+                    if (borrow.status === 'approved' && borrow.is_returned) {
+                        displayStatus = 'returned';
+                    }
+
                     // Show 'Unreturned' for approved but not returned items
-                    if (borrow.status === 'approved' && !borrow.is_returned) {
+                    else if (borrow.status === 'approved' && !borrow.is_returned) {
                         displayStatus = 'unreturned';
                     }
 
                     // Show 'Past Due' for items that are past their due date
                     if (borrow.is_past_due) {
                         displayStatus = 'past_due';
+                    }
+
+                    // If a specific status was requested in the filter, prioritize showing that status
+                    const selectedStatus = document.getElementById('status').value;
+                    if (selectedStatus) {
+                        // For 'returned' status filter, ensure we show returned items
+                        if (selectedStatus === 'returned' && borrow.is_returned) {
+                            displayStatus = 'returned';
+                        }
+                        // For other statuses, match the filter if it matches the borrow status
+                        else if (selectedStatus === borrow.status) {
+                            displayStatus = selectedStatus;
+                        }
                     }
 
                     row.innerHTML = `
@@ -273,23 +322,32 @@
                                 </div>
                                 <div class="ml-4">
                                     <div class="text-sm font-medium text-gray-900">${borrow.user.full_name.toUpperCase()}</div>
+                                    <div class="text-xs text-gray-500">${borrow.user.username || ''}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">${borrow.paper.title.toUpperCase()}</div>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">${borrow.paper.title.toUpperCase()}</div>
+                            ${borrow.paper.year ? `<div class="text-xs text-gray-500">Year: ${borrow.paper.year}</div>` : ''}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900">${borrow.program.toUpperCase()}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">${borrow.request_date}</div>
+                            <div class="text-sm text-gray-900">${requestDate}</div>
+                            <div class="text-xs text-gray-500">${requestTime}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs font-semibold rounded-full
                                 ${getStatusClass(displayStatus)}">
                                 ${capitalizeFirst(displayStatus)}
                             </span>
+                            ${displayStatus === 'returned' && returnDate ?
+                              `<div class="text-xs text-blue-500 mt-1">Returned on: ${returnDate}</div>` : ''}
+                            ${displayStatus !== 'returned' && borrow.due_date ?
+                              `<div class="text-xs text-gray-500 mt-1">Due: ${borrow.due_date}</div>` : ''}
+                            ${borrow.rejection_reason ?
+                              `<div class="text-xs text-red-500 mt-1">Reason: ${borrow.rejection_reason}</div>` : ''}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             <a href="/accounts/admin/borrows/${borrow.id}/" class="text-emerald-600 hover:text-emerald-900">View Details</a>
@@ -354,10 +412,37 @@
         }
 
         reportTitleElement.textContent = titleText;
+
+        // Update table headers based on status
+        updateTableHeaders(status);
+    }
+
+    function updateTableHeaders(status) {
+        // Get the table header row
+        const headerRow = document.querySelector('#report-table thead tr');
+        if (!headerRow) return;
+
+        // Update the status column header text based on the selected status
+        const statusHeader = headerRow.querySelector('th:nth-child(5)');
+        if (statusHeader) {
+            if (status === 'returned') {
+                statusHeader.textContent = 'STATUS/RETURN DATE';
+            } else {
+                statusHeader.textContent = 'STATUS/DETAILS';
+            }
+        }
     }
 
     function printReport() {
         const printContent = document.getElementById('report-table').cloneNode(true);
+
+        // Convert status badges to print-friendly format
+        const statusBadges = printContent.querySelectorAll('span[class*="bg-"]');
+        statusBadges.forEach(badge => {
+            const status = badge.textContent.trim().toLowerCase();
+            badge.className = ''; // Clear existing classes
+            badge.classList.add('status-badge', `status-${status.replace('_', '-')}`);
+        });
 
         const printWindow = window.open('', '', 'height=600,width=800');
         const reportTitle = document.getElementById('report-title').textContent;
@@ -365,7 +450,7 @@
         printWindow.document.write('<style>');
         printWindow.document.write(`
             body {
-                font-family: Arial, sans-serif;
+                font-family: 'Poppins', 'Roboto', Arial, sans-serif;
                 padding: 20px;
             }
             table {
@@ -381,6 +466,11 @@
             th {
                 background-color: #f8f9fa;
                 font-weight: 600;
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+            td {
+                font-size: 14px;
             }
             .status-badge {
                 padding: 4px 8px;
@@ -388,12 +478,48 @@
                 font-size: 12px;
                 font-weight: 600;
             }
+            .status-pending {
+                background-color: #fef3c7;
+                color: #92400e;
+            }
+            .status-approved {
+                background-color: #d1fae5;
+                color: #065f46;
+            }
+            .status-rejected {
+                background-color: #fee2e2;
+                color: #b91c1c;
+            }
+            .status-returned {
+                background-color: #dbeafe;
+                color: #1e40af;
+            }
+            .status-unreturned {
+                background-color: #ede9fe;
+                color: #5b21b6;
+            }
+            .status-past-due {
+                background-color: #fecaca;
+                color: #991b1b;
+                font-weight: bold;
+            }
+            .report-title {
+                text-align: center;
+                margin-bottom: 20px;
+                color: #047857;
+            }
+            .report-date {
+                text-align: right;
+                font-size: 12px;
+                margin-bottom: 10px;
+            }
             @media print {
                 .no-print { display: none; }
             }
         `);
         printWindow.document.write('</style></head><body>');
-        printWindow.document.write('<h1>Borrow Management Report</h1>');
+        printWindow.document.write(`<h1 class="report-title">${reportTitle}</h1>`);
+        printWindow.document.write(`<div class="report-date">Generated on: ${new Date().toLocaleString()}</div>`);
         printWindow.document.write(printContent.outerHTML);
         printWindow.document.write('</body></html>');
         printWindow.document.close();

@@ -17,7 +17,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.sessions.models import Session
 from django.utils import timezone
 from django.core.paginator import Paginator
-from django.db.models import Q, Count
+from django.db.models import Q, Count, BooleanField
 from scholar.models import Paper, Borrow
 
 def home(request):
@@ -40,13 +40,104 @@ def home(request):
             if query.lower() in code.lower() or query.lower() in name.lower():
                 program_filters |= Q(program=code)
 
-        # Main search filters including program search
-        filters = Q(title__icontains=query) | Q(abstract__icontains=query) | Q(authors__name__icontains=query) | program_filters
+        # Split the query into words for more flexible searching
+        query_words = query.lower().split()
 
-        if query.isdigit():
-            filters |= Q(publication_date__year=int(query))
+        # Initialize empty Q objects for different priority levels
+        exact_match_filters = Q()  # Highest priority - exact matches
+        starts_with_filters = Q()  # High priority - starts with the query
+        contains_filters = Q()     # Medium priority - contains the query
 
-        papers = papers.filter(filters).distinct()
+        # For each word in the query, add it to the appropriate filters
+        for word in query_words:
+            # Exact match filters (highest priority) - match whole words only
+            exact_match_filters |= Q(title__iregex=r'\b' + word + r'\b')
+            exact_match_filters |= Q(keywords__iregex=r'\b' + word + r'\b')
+
+            # Starts with filters (high priority) - match words that start with the query
+            starts_with_filters |= Q(title__iregex=r'\b' + word)
+            starts_with_filters |= Q(keywords__iregex=r'\b' + word)
+            starts_with_filters |= Q(authors__name__iregex=r'\b' + word)
+
+            # Contains filters (medium priority) - only if the word is at least 3 characters
+            if len(word) >= 3:
+                contains_filters |= Q(title__icontains=word)
+                contains_filters |= Q(abstract__icontains=word)
+                contains_filters |= Q(authors__name__icontains=word)
+                contains_filters |= Q(keywords__icontains=word)
+
+            # If the word is a digit, try to match it as a year
+            if word.isdigit():
+                contains_filters |= Q(publication_date__year=int(word))
+
+        # Add program filters
+        contains_filters |= program_filters
+
+        # Combine all filters with distinct to avoid duplicates
+        # We'll use annotate and Case/When to add a relevance score
+        from django.db.models import Case, When, IntegerField, Value
+
+        # Apply filters and add relevance score with debug info
+        papers = papers.filter(
+            exact_match_filters | starts_with_filters | contains_filters
+        ).annotate(
+            # Add debug fields to show exactly where matches are found
+            title_contains=Case(
+                When(condition=Q(title__iregex=r'\b' + query.lower() + r'\b'), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            ),
+            abstract_contains=Case(
+                When(condition=Q(abstract__iregex=r'\b' + query.lower() + r'\b'), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            ),
+            keywords_contains=Case(
+                When(condition=Q(keywords__iregex=r'\b' + query.lower() + r'\b'), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            ),
+            authors_contains=Case(
+                When(condition=Q(authors__name__iregex=r'\b' + query.lower() + r'\b'), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            ),
+
+            # Relevance scoring
+            relevance=Case(
+                # Exact matches get highest score (5)
+                When(condition=exact_match_filters, then=Value(5)),
+                # Starts with gets high score (3)
+                When(condition=starts_with_filters, then=Value(3)),
+                # Contains gets lowest score (1)
+                default=Value(1),
+                output_field=IntegerField(),
+            ),
+
+            # Add a field to check if the title contains the exact word
+            title_match=Case(
+                When(condition=Q(title__iregex=r'\b' + query.lower() + r'\b'), then=Value(10)),
+                default=Value(0),
+                output_field=IntegerField(),
+            ),
+
+            # Add a field to check if keywords contain the exact word
+            keyword_match=Case(
+                When(condition=Q(keywords__iregex=r'\b' + query.lower() + r'\b'), then=Value(5)),
+                default=Value(0),
+                output_field=IntegerField(),
+            ),
+
+            # Add a field for title matches only (highest priority)
+            title_exact_match=Case(
+                When(
+                    condition=Q(title__iregex=r'\b' + query.lower() + r'\b'),
+                    then=Value(30)
+                ),
+                default=Value(0),
+                output_field=IntegerField(),
+            )
+        ).distinct().order_by('-title_exact_match', '-title_match', '-keyword_match', '-relevance')
 
     # Program filtering
     if program:
@@ -58,17 +149,31 @@ def home(request):
     if year_to and year_to.isdigit():
         papers = papers.filter(publication_date__year__lte=int(year_to))
 
-    # Sorting
-    if sort == 'newest':
-        papers = papers.order_by('-publication_date')
-    elif sort == 'oldest':
-        papers = papers.order_by('publication_date')
-    elif sort == 'title_asc':
-        papers = papers.order_by('title')
-    elif sort == 'title_desc':
-        papers = papers.order_by('-title')
-    elif sort == 'citations':
-        papers = papers.order_by('-citations')
+    # Sorting with priority for exact title matches when searching
+    if query:
+        # Always prioritize exact title matches first, then apply the selected sort
+        if sort == 'newest':
+            papers = papers.order_by('-title_exact_match', '-publication_date')
+        elif sort == 'oldest':
+            papers = papers.order_by('-title_exact_match', 'publication_date')
+        elif sort == 'title_asc':
+            papers = papers.order_by('-title_exact_match', 'title')
+        elif sort == 'title_desc':
+            papers = papers.order_by('-title_exact_match', '-title')
+        elif sort == 'citations':
+            papers = papers.order_by('-title_exact_match', '-citations')
+    else:
+        # Regular sorting when not searching
+        if sort == 'newest':
+            papers = papers.order_by('-publication_date')
+        elif sort == 'oldest':
+            papers = papers.order_by('publication_date')
+        elif sort == 'title_asc':
+            papers = papers.order_by('title')
+        elif sort == 'title_desc':
+            papers = papers.order_by('-title')
+        elif sort == 'citations':
+            papers = papers.order_by('-citations')
 
     # Get all program choices for the filter dropdown
     program_choices = Student.PROGRAM_CHOICES
@@ -93,7 +198,7 @@ from django.views.decorators.clickjacking import xframe_options_deny
 from django.http import HttpResponseForbidden
 from datetime import datetime
 
-# 
+#
 # Prevent embedding in iframes for security
 def paper_detail(request, paper_id):
     paper = get_object_or_404(Paper, id=paper_id)
@@ -125,8 +230,8 @@ def paper_detail(request, paper_id):
         ).values_list('paper_id', flat=True)
 
     # Add security context variables
-   
-   
+
+
 
     return render(request, 'scholar/paper_detail.html', {
         'paper': paper,

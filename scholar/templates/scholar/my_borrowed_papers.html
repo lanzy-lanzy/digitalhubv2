@@ -31,6 +31,11 @@
                     <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-red-100 text-red-800">
                         Rejected
                     </span>
+                    {% if borrow.rejection_reason %}
+                    <button type="button" onclick="showRejectionReason('{{ borrow.rejection_reason|escapejs }}')" class="ml-2 text-xs text-red-600 underline">
+                        View Reason
+                    </button>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -137,6 +142,13 @@
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                 Rejected
                             </span>
+                            {% if borrow.rejection_reason %}
+                            <div class="mt-1">
+                                <button type="button" onclick="showRejectionReason('{{ borrow.rejection_reason|escapejs }}')" class="text-xs text-red-600 underline">
+                                    View Reason
+                                </button>
+                            </div>
+                            {% endif %}
                             {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -165,6 +177,33 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Rejection Reason Modal -->
+<div id="rejectionReasonModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 transform transition-all">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Rejection Reason</h3>
+                <button type="button" onclick="closeRejectionModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <div id="rejectionReasonText" class="p-4 bg-red-50 text-red-800 rounded-md border border-red-200"></div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" onclick="closeRejectionModal()"
+                    class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -204,5 +243,15 @@
             }
         });
     });
+
+    // Functions for rejection reason modal
+    function showRejectionReason(reason) {
+        document.getElementById('rejectionReasonText').textContent = reason;
+        document.getElementById('rejectionReasonModal').classList.remove('hidden');
+    }
+
+    function closeRejectionModal() {
+        document.getElementById('rejectionReasonModal').classList.add('hidden');
+    }
 </script>
 {% endblock %}

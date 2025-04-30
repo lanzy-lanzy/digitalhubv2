@@ -121,6 +121,7 @@ class Borrow(models.Model):
     borrow_reason = models.TextField(blank=True, null=True, help_text='Reason for borrowing this paper')
     request_date = models.DateTimeField(default=timezone.now)
     notification_read = models.BooleanField(default=False, help_text='Whether the approval notification has been read')
+    rejection_reason = models.TextField(blank=True, null=True, help_text='Reason for rejecting this borrow request')
 
     class Meta:
         ordering = ['-borrow_date']

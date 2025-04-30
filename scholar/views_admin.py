@@ -143,7 +143,13 @@ def reject_borrow(request, borrow_id):
     borrow = get_object_or_404(Borrow, id=borrow_id)
 
     if borrow.status == 'pending':
+        # Get the rejection reason from the form
+        rejection_reason = request.POST.get('rejection_reason', '')
+
+        # Update the borrow record
         borrow.status = 'rejected'
+        borrow.rejection_reason = rejection_reason
+        borrow.notification_read = False  # Ensure the user gets a notification
         borrow.save()
 
         # Increment available copies of the paper since we're rejecting the request
@@ -151,7 +157,7 @@ def reject_borrow(request, borrow_id):
         paper.available_copies += 1
         paper.save()
 
-        messages.success(request, 'Borrow request rejected and available copies updated.')
+        messages.success(request, 'Borrow request rejected with reason provided and available copies updated.')
     else:
         messages.warning(request, 'Borrow request is not pending.')
 

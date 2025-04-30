@@ -36,6 +36,46 @@
         border-left: 4px solid #10b981;
     }
 
+    /* Special styling for exact title matches - highest priority */
+    .paper-card[data-match-type="title-exact"] {
+        border-left: 4px solid #ec4899;
+        background-color: rgba(236, 72, 153, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.1), 0 2px 4px -1px rgba(236, 72, 153, 0.06);
+        transform: translateY(-3px);
+    }
+
+    /* Special styling for title matches - high priority */
+    .paper-card[data-match-type="title"] {
+        border-left: 4px solid #8b5cf6;
+        background-color: rgba(139, 92, 246, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.1), 0 2px 4px -1px rgba(139, 92, 246, 0.06);
+    }
+
+    /* Special styling for keyword matches */
+    .paper-card[data-match-type="keyword"] {
+        border-left: 4px solid #3b82f6;
+        background-color: rgba(59, 130, 246, 0.05);
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1), 0 2px 4px -1px rgba(59, 130, 246, 0.06);
+    }
+
+    /* Special styling for abstract matches */
+    .paper-card[data-match-type="abstract"] {
+        border-left: 4px solid #6366f1;
+        background-color: rgba(99, 102, 241, 0.05);
+    }
+
+    /* Special styling for author matches */
+    .paper-card[data-match-type="author"] {
+        border-left: 4px solid #10b981;
+        background-color: rgba(16, 185, 129, 0.05);
+    }
+
+    /* Special styling for other matches */
+    .paper-card[data-match-type="other"] {
+        border-left: 4px solid #9ca3af;
+        background-color: rgba(156, 163, 175, 0.05);
+    }
+
     .search-container {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         border-radius: 1rem;
@@ -131,20 +171,284 @@
         color: white;
         border: 1px solid #10b981;
     }
+
+    /* Highlighted search terms */
+    .abstract-content .highlight {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #065f46;
+        padding: 0 2px;
+        border-radius: 2px;
+        font-weight: 500;
+    }
+
+    /* Highlighted search terms at the beginning of words */
+    .abstract-content .highlight-start {
+        background-color: rgba(16, 185, 129, 0.4);
+        color: #065f46;
+        padding: 0 2px;
+        border-radius: 2px;
+        font-weight: 600;
+        border-bottom: 2px solid #10b981;
+    }
+
+    /* Pulse animation for exact matches */
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+        }
+    }
+
+    /* Carousel Styles */
+    .carousel {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2), 0 8px 10px -6px rgba(16, 185, 129, 0.15);
+        margin-bottom: 1.5rem;
+        border: 2px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .carousel-inner {
+        display: flex;
+        transition: transform 0.5s ease;
+    }
+
+    .carousel-item {
+        min-width: 100%;
+        position: relative;
+    }
+
+    .carousel-item img {
+        object-fit: cover;
+        object-position: center;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Emerald pattern overlay */
+    .carousel-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    /* Emerald gradient overlay */
+    .carousel-item::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40%;
+        background: linear-gradient(to top, rgba(16, 185, 129, 0.7), transparent);
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    .carousel-control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(16, 185, 129, 0.8);
+        color: white;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+        border: 2px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .carousel-control:hover {
+        background-color: rgba(16, 185, 129, 1);
+        transform: translateY(-50%) scale(1.05);
+        box-shadow: 0 6px 15px rgba(16, 185, 129, 0.5);
+    }
+
+    .carousel-control-prev {
+        left: 1rem;
+    }
+
+    .carousel-control-next {
+        right: 1rem;
+    }
+
+    .carousel-indicators {
+        position: absolute;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 0.75rem;
+        z-index: 10;
+    }
+
+    .carousel-indicator {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .carousel-indicator.active {
+        background-color: white;
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.6);
+    }
+
+    /* Text shadow for better readability */
+    .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
+                     0px 0px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Emerald pattern for page background */
+    .emerald-pattern {
+        background-color: #ecfdf5;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%2310b981' fill-opacity='0.08'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
 </style>
+
+<!-- Emerald Pattern Background -->
+<div class="emerald-pattern py-6">
+    <!-- Carousel Section -->
+    <div class="max-w-7xl mx-auto px-2 sm:px-0 mb-6">
+        <div class="carousel">
+            <div class="carousel-inner">
+                <!-- Slide 1 -->
+                <div class="carousel-item">
+                    <div class="relative h-64 sm:h-80 md:h-96 overflow-hidden">
+                        <img src="{% static 'images/carousel/carousel_1.jpg' %}" alt="Digital Hub Banner" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center z-10">
+                            <div class="text-center px-4 sm:px-6 md:px-8 bg-black bg-opacity-50 backdrop-blur-sm rounded-xl py-6 sm:py-8 shadow-2xl max-w-4xl mx-auto">
+                                <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-4 drop-shadow-lg text-shadow">Welcome to J.H. CSC Digital Hub</h1>
+                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Your gateway to computer science research and projects</p>
+                                <div class="mt-6 flex justify-center">
+                                    <span class="inline-flex rounded-md shadow-lg">
+                                        <a href="#search" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                                            <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                            </svg>
+                                            Start Exploring
+                                        </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="carousel-item">
+                    <div class="relative h-64 sm:h-80 md:h-96 overflow-hidden">
+                        <img src="{% static 'images/carousel/carousel_2.jpg' %}" alt="Research Projects" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center z-10">
+                            <div class="text-center px-4 sm:px-6 md:px-8 bg-black bg-opacity-50 backdrop-blur-sm rounded-xl py-6 sm:py-8 shadow-2xl max-w-4xl mx-auto">
+                                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-4 drop-shadow-lg text-shadow">Discover Research Projects</h2>
+                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Explore innovative computer science research from our students</p>
+                                {% if user.is_authenticated %}
+                                <div class="mt-6 flex justify-center">
+                                    <span class="inline-flex rounded-md shadow-lg">
+                                        <a href="#" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                                            <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            Browse Projects
+                                        </a>
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="carousel-item">
+                    <div class="relative h-64 sm:h-80 md:h-96 overflow-hidden">
+                        <img src="{% static 'images/carousel/carousel_3.jpeg' %}" alt="Share Knowledge" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="absolute inset-0 flex items-center justify-center z-10">
+                            <div class="text-center px-4 sm:px-6 md:px-8 bg-black bg-opacity-50 backdrop-blur-sm rounded-xl py-6 sm:py-8 shadow-2xl max-w-4xl mx-auto">
+                                <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-4 drop-shadow-lg text-shadow">Share Your Knowledge</h2>
+                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Contribute to our growing repository of computer science resources</p>
+                                {% if user.is_authenticated %}
+                                <div class="mt-6 flex justify-center">
+                                    <span class="inline-flex rounded-md shadow-lg">
+                                        <a href="#" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                                            <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                            </svg>
+                                            Upload Project
+                                        </a>
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Controls -->
+            <div class="carousel-control carousel-control-prev" onclick="moveCarousel(-1)">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </div>
+            <div class="carousel-control carousel-control-next" onclick="moveCarousel(1)">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators">
+                <div class="carousel-indicator active" onclick="goToSlide(0)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(1)"></div>
+                <div class="carousel-indicator" onclick="goToSlide(2)"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- Sticky Search Section -->
-<div class="sticky top-16 sm:top-20 z-40 mb-3 sm:mb-4 pt-2 bg-gradient-to-b from-white to-transparent">
-    <div class="search-container p-2 sm:p-3 max-w-2xl mx-auto shadow-lg">
-        <form method="get" action="{% url 'home' %}" class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+<div id="search" class="sticky top-16 sm:top-20 z-40 mb-3 sm:mb-4 pt-2 bg-gradient-to-b from-emerald-50 to-transparent">
+    <div class="search-container p-2 sm:p-3 max-w-2xl mx-auto shadow-lg border-2 border-emerald-200">
+        <form method="get" action="{% url 'home' %}" class="flex flex-col sm:flex-row gap-2 sm:gap-3" id="search-form">
             <div class="flex-1 relative">
-                <input type="text" name="q" value="{{ query }}"
+                <input type="text" name="q" value="{{ query }}" id="search-input"
                        class="search-input w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                       placeholder="Search projects, technologies..." />
+                       placeholder="Search projects, technologies..." autocomplete="off" />
                 <svg class="absolute left-2.5 sm:left-3 top-2.5 sm:top-3.5 h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
+                <!-- Loading indicator -->
+                <div id="search-loading" class="hidden absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <svg class="animate-spin h-5 w-5 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </div>
             </div>
             <button type="submit"
                     class="search-button px-4 sm:px-6 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base rounded-lg hover:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
@@ -300,6 +604,34 @@
             {% endif %}
 
             <div class="space-y-6">
+                <!-- Real-time search status indicator -->
+                <div id="search-status" class="hidden bg-white rounded-lg p-4 shadow-sm border-l-4 border-emerald-500">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="h-5 w-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Real-time search active: <span id="search-query-display" class="font-medium text-emerald-700"></span></span>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500 flex items-center">
+                        <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
+                        </svg>
+                        Results are prioritized by match type: <span class="font-medium">exact title matches always appear first</span>, followed by partial title matches, then keywords, abstract, authors
+                    </div>
+                    <div class="mt-1 text-xs text-gray-500 flex flex-wrap items-center ml-5">
+                        <span class="w-2 h-2 rounded-full bg-pink-500 mr-1"></span>
+                        <span>Exact Title Match</span>
+                        <span class="w-2 h-2 rounded-full bg-purple-500 mx-2"></span>
+                        <span>Title</span>
+                        <span class="w-2 h-2 rounded-full bg-blue-500 mx-2"></span>
+                        <span>Keywords</span>
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 mx-2"></span>
+                        <span>Abstract</span>
+                        <span class="w-2 h-2 rounded-full bg-green-500 mx-2"></span>
+                        <span>Authors</span>
+                    </div>
+                </div>
+
                 {% if query or year_from or year_to or program %}
                     <div class="bg-white rounded-lg p-4 shadow-sm">
                         <div class="flex flex-wrap items-center text-sm text-gray-600">
@@ -333,7 +665,29 @@
                 {% endif %}
 
                 {% for paper in papers %}
-                    <div class="paper-card bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="paper-card bg-white rounded-lg shadow-sm overflow-hidden"
+                        {% if query %}
+                            {% if paper.title_exact_match > 0 %}
+                                data-relevance="30"
+                                data-match-type="title-exact"
+                            {% elif paper.title_contains %}
+                                data-relevance="15"
+                                data-match-type="title"
+                            {% elif paper.keywords_contains %}
+                                data-relevance="10"
+                                data-match-type="keyword"
+                            {% elif paper.abstract_contains %}
+                                data-relevance="8"
+                                data-match-type="abstract"
+                            {% elif paper.authors_contains %}
+                                data-relevance="5"
+                                data-match-type="author"
+                            {% else %}
+                                data-relevance="{{ paper.relevance|default:'1' }}"
+                                data-match-type="other"
+                            {% endif %}
+                        {% endif %}
+                    >
                         <!-- Paper Header -->
                         <div class="p-4 sm:p-6">
                             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between">
@@ -355,6 +709,53 @@
                                             </span>
                                         {% endif %}
                                         <span class="text-xs text-gray-500">Created {{ paper.publication_date|date:"M d, Y" }}</span>
+
+                                        {% if query %}
+                                            {% if paper.title_exact_match > 0 %}
+                                                <span class="badge bg-pink-100 text-pink-800 border border-pink-200">
+                                                    <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                                                    </svg>
+                                                    Exact Title Match
+                                                </span>
+                                            {% endif %}
+
+                                            {% if paper.title_contains and not paper.title_exact_match %}
+                                                <span class="badge bg-purple-100 text-purple-800 border border-purple-200">
+                                                    <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                                    </svg>
+                                                    Title
+                                                </span>
+                                            {% endif %}
+
+                                            {% if paper.abstract_contains %}
+                                                <span class="badge bg-indigo-100 text-indigo-800 border border-indigo-200">
+                                                    <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    </svg>
+                                                    Abstract
+                                                </span>
+                                            {% endif %}
+
+                                            {% if paper.keywords_contains %}
+                                                <span class="badge bg-blue-100 text-blue-800 border border-blue-200">
+                                                    <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                                    </svg>
+                                                    Keywords
+                                                </span>
+                                            {% endif %}
+
+                                            {% if paper.authors_contains %}
+                                                <span class="badge bg-green-100 text-green-800 border border-green-200">
+                                                    <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                    </svg>
+                                                    Authors
+                                                </span>
+                                            {% endif %}
+                                        {% endif %}
                                     </div>
 
                                     <div class="mb-2">
@@ -435,7 +836,7 @@
 
                                     <!-- Abstract -->
                                     <div class="mb-4 sm:mb-6">
-                                        <p class="text-gray-700 text-xs sm:text-sm leading-relaxed no-copy line-clamp-2 sm:line-clamp-3 text-justify">{{ paper.abstract }}</p>
+                                        <p class="text-gray-700 text-xs sm:text-sm leading-relaxed no-copy line-clamp-2 sm:line-clamp-3 text-justify abstract-content">{{ paper.abstract }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -491,7 +892,7 @@
                                 </div>
 
                                 {% if user.is_authenticated %}
-                                    <div>
+                                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                                         {% if paper.id in user_bookmarked_papers %}
                                             <form action="{% url 'unbookmark_paper' paper.id %}" method="post" class="inline">
                                                 {% csrf_token %}
@@ -517,7 +918,29 @@
                                                 </button>
                                             </form>
                                         {% endif %}
+
+                                        <!-- Citation Button -->
+                                        <button type="button"
+                                                onclick="showCitationModal('{{ paper.id }}', '{{ paper.title|escapejs }}', '{% for author in paper.authors.all %}{{ author.name|escapejs }}{% if not forloop.last %}, {% endif %}{% endfor %}', '{{ paper.publication_date|date:"Y" }}')"
+                                                class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-indigo-600 text-xs sm:text-sm font-medium rounded-md text-indigo-600 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                                            <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                            </svg>
+                                            <span class="hidden xs:inline">Cite</span>
+                                            <span class="xs:hidden">Cite</span>
+                                        </button>
                                     </div>
+                                {% else %}
+                                    <!-- Citation Button for non-authenticated users -->
+                                    <button type="button"
+                                            onclick="showCitationModal('{{ paper.id }}', '{{ paper.title|escapejs }}', '{% for author in paper.authors.all %}{{ author.name|escapejs }}{% if not forloop.last %}, {% endif %}{% endfor %}', '{{ paper.publication_date|date:"Y" }}')"
+                                            class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-indigo-600 text-xs sm:text-sm font-medium rounded-md text-indigo-600 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                                        <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                        </svg>
+                                        <span class="hidden xs:inline">Cite</span>
+                                        <span class="xs:hidden">Cite</span>
+                                    </button>
                                 {% endif %}
                             </div>
                         </div>
@@ -589,6 +1012,684 @@
     document.addEventListener('keydown', function(event) {
         if (event.ctrlKey && (event.key === 'c' || event.key === 'x' || event.key === 'a')) {
             event.preventDefault();
+        }
+    });
+
+    // Carousel functionality
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-item');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    const totalSlides = slides.length;
+
+    // Initialize carousel
+    function initCarousel() {
+        if (slides.length === 0) return;
+
+        // Set initial position
+        updateCarousel();
+
+        // Auto-advance slides every 5 seconds
+        setInterval(() => {
+            moveCarousel(1);
+        }, 5000);
+    }
+
+    // Move carousel by a certain number of slides
+    function moveCarousel(direction) {
+        currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+        updateCarousel();
+    }
+
+    // Go to a specific slide
+    function goToSlide(slideIndex) {
+        currentSlide = slideIndex;
+        updateCarousel();
+    }
+
+    // Update carousel position and indicators
+    function updateCarousel() {
+        const carouselInner = document.querySelector('.carousel-inner');
+        carouselInner.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        // Update indicators
+        indicators.forEach((indicator, index) => {
+            if (index === currentSlide) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+        });
+    }
+
+    // Common search terms that might help users find content
+    const searchSuggestions = [
+        'web', 'development', 'programming', 'computer', 'science',
+        'database', 'network', 'security', 'algorithm', 'data',
+        'analysis', 'research', 'project', 'thesis', 'study',
+        'application', 'mobile', 'software', 'hardware', 'system',
+        'design', 'interface', 'user', 'experience', 'technology'
+    ];
+
+    // Function to suggest search terms when no results are found
+    function suggestSearch() {
+        // Get current query
+        const currentQuery = document.getElementById('search-input').value.trim().toLowerCase();
+
+        // Find suggestions that are not already in the query
+        const relevantSuggestions = searchSuggestions.filter(suggestion =>
+            !currentQuery.includes(suggestion) &&
+            // Avoid suggesting terms that are too similar to what's already being searched
+            !searchSuggestions.some(term =>
+                currentQuery.includes(term) &&
+                suggestion.includes(term) &&
+                suggestion !== term
+            )
+        );
+
+        // Select 3 random suggestions
+        const shuffled = relevantSuggestions.sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, 3);
+
+        // Create a modal with suggestions
+        const suggestionsModal = document.createElement('div');
+        suggestionsModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        suggestionsModal.id = 'suggestions-modal';
+
+        suggestionsModal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Search Suggestions</h3>
+                <p class="text-gray-600 mb-4">Try one of these search terms:</p>
+                <div class="space-y-2">
+                    ${selected.map(suggestion => `
+                        <button onclick="applySuggestion('${suggestion}')"
+                                class="w-full text-left px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-md transition-colors flex items-center">
+                            <svg class="h-4 w-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            ${suggestion}
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="document.getElementById('suggestions-modal').remove()"
+                            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-800 transition-colors">
+                        Close
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(suggestionsModal);
+    }
+
+    // Function to apply a suggested search term
+    function applySuggestion(suggestion) {
+        const searchInput = document.getElementById('search-input');
+        searchInput.value = suggestion;
+        searchInput.dispatchEvent(new Event('input'));
+        document.getElementById('suggestions-modal').remove();
+    }
+
+    // Function to highlight search terms in abstracts and titles
+    function highlightSearchTerms(query) {
+        if (!query) return;
+
+        // Split query into words
+        const words = query.toLowerCase().split(/\s+/).filter(word => word.length > 1);
+        if (words.length === 0) return;
+
+        // Get all abstract elements
+        const abstracts = document.querySelectorAll('.abstract-content');
+
+        // Get all title elements (for better visual indication of matches)
+        const titles = document.querySelectorAll('.paper-card h2');
+
+        abstracts.forEach(abstract => {
+            let html = abstract.textContent;
+
+            // First, handle word boundary matches (beginning of words)
+            // This needs to be done first to avoid double-highlighting
+            words.forEach(word => {
+                // Create a regex that matches the word at the beginning of a word boundary
+                const wordBoundaryRegex = new RegExp(`(\\b${word})`, 'gi');
+
+                // Replace with special highlight class for word beginnings
+                html = html.replace(wordBoundaryRegex, '<span class="highlight-start">$1</span>');
+            });
+
+            // Then handle other matches that aren't at word boundaries
+            words.forEach(word => {
+                // Create a regex that matches the word but not at the beginning of a word
+                // We use negative lookbehind (?<!\b) to avoid matching what we already matched
+                // But since lookbehind isn't supported in all browsers, we'll use a simpler approach
+                const regex = new RegExp(`(?![^<]*>)(${word})`, 'gi');
+
+                // Replace with regular highlight class, but avoid replacing inside tags
+                html = html.replace(regex, (match, p1, offset) => {
+                    // Skip if this is inside a tag or already highlighted
+                    if (html.substring(0, offset).split('<').length !==
+                        html.substring(0, offset).split('>').length) {
+                        return match;
+                    }
+
+                    // Skip if this is already part of a highlight-start span
+                    if (html.substring(Math.max(0, offset - 30), offset).includes('highlight-start')) {
+                        return match;
+                    }
+
+                    return `<span class="highlight">${p1}</span>`;
+                });
+            });
+
+            // Update the HTML
+            abstract.innerHTML = html;
+        });
+
+        // Highlight search terms in titles for better visual indication
+        titles.forEach(title => {
+            // Only process titles in cards that aren't already exact title matches
+            const card = title.closest('.paper-card');
+            if (card && card.getAttribute('data-match-type') !== 'title-exact') {
+                let html = title.innerHTML;
+
+                // Check for exact title match first
+                const titleText = title.textContent.toLowerCase();
+                const exactQueryMatch = query.toLowerCase();
+
+                if (titleText.includes(exactQueryMatch)) {
+                    // If the title contains the exact query, highlight it with a stronger style
+                    const regex = new RegExp(`(${exactQueryMatch})`, 'gi');
+                    html = html.replace(regex, '<span style="background-color: rgba(236, 72, 153, 0.2); color: #be185d; padding: 0 2px; border-radius: 2px; font-weight: 600;">$1</span>');
+                } else {
+                    // Otherwise highlight individual words
+                    words.forEach(word => {
+                        const wordRegex = new RegExp(`(\\b${word})`, 'gi');
+                        html = html.replace(wordRegex, '<span style="background-color: rgba(139, 92, 246, 0.15); color: #6d28d9; padding: 0 2px; border-radius: 2px; font-weight: 500;">$1</span>');
+                    });
+                }
+
+                // Update the HTML
+                title.innerHTML = html;
+            }
+        });
+    }
+
+    // Function to update visual indicators for relevance and sort by exact title match
+    function updateRelevanceIndicators() {
+        // Get all paper cards
+        const paperCards = document.querySelectorAll('.paper-card');
+        const paperCardsArray = Array.from(paperCards);
+
+        // Sort paper cards by relevance and match type
+        // This ensures exact title matches always appear at the top
+        paperCardsArray.sort((a, b) => {
+            const aMatchType = a.getAttribute('data-match-type');
+            const bMatchType = b.getAttribute('data-match-type');
+            const aRelevance = parseInt(a.getAttribute('data-relevance') || '0');
+            const bRelevance = parseInt(b.getAttribute('data-relevance') || '0');
+
+            // First prioritize exact title matches
+            if (aMatchType === 'title-exact' && bMatchType !== 'title-exact') {
+                return -1;
+            }
+            if (bMatchType === 'title-exact' && aMatchType !== 'title-exact') {
+                return 1;
+            }
+
+            // Then prioritize by relevance score
+            return bRelevance - aRelevance;
+        });
+
+        // Reorder the cards in the DOM
+        const resultsContainer = document.querySelector('.space-y-6');
+        const searchStatus = document.getElementById('search-status');
+
+        // If search status exists, insert sorted cards after it
+        // Otherwise insert at the beginning of the container
+        const insertPoint = searchStatus || resultsContainer.firstChild;
+
+        // Remove and reinsert cards in sorted order
+        paperCardsArray.forEach(card => {
+            resultsContainer.appendChild(card);
+        });
+
+        // Add visual enhancements based on relevance
+        paperCardsArray.forEach(card => {
+            const relevance = card.getAttribute('data-relevance');
+            const matchType = card.getAttribute('data-match-type');
+
+            // Skip if no relevance attribute
+            if (!relevance) return;
+
+            // Add visual enhancements based on match type
+            switch(matchType) {
+                case 'title-exact':
+                    // Add a strong pulse animation for exact title matches
+                    card.style.animation = 'pulse 1.5s infinite';
+                    card.style.animationDelay = '0.1s';
+                    card.style.zIndex = '30'; // Bring to front
+                    card.style.transform = 'translateY(-3px)'; // More elevation
+
+                    // Add a title attribute for tooltip
+                    card.setAttribute('title', 'Exact match in title - highest relevance');
+                    break;
+
+                case 'title':
+                    // Add a strong pulse animation for title matches
+                    card.style.animation = 'pulse 2.5s infinite';
+                    card.style.animationDelay = '0.3s';
+                    card.style.zIndex = '15'; // Bring to front
+
+                    // Add a title attribute for tooltip
+                    card.setAttribute('title', 'Exact match in title - high relevance');
+                    break;
+
+                case 'keyword':
+                    // Add a subtle pulse animation for keyword matches
+                    card.style.animation = 'pulse 3s infinite';
+                    card.style.animationDelay = '0.5s';
+                    card.style.zIndex = '10'; // Bring forward but not as much as title
+
+                    // Add a title attribute for tooltip
+                    card.setAttribute('title', 'Exact match in keywords - medium relevance');
+                    break;
+
+                case 'abstract':
+                    // Add a subtle pulse animation for abstract matches
+                    card.style.animation = 'pulse 4s infinite';
+                    card.style.animationDelay = '0.7s';
+                    card.style.zIndex = '5'; // Bring forward slightly
+
+                    // Add a title attribute for tooltip
+                    card.setAttribute('title', 'Exact match in abstract - medium relevance');
+                    break;
+
+                case 'author':
+                    // Add a subtle highlight for author matches
+                    card.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.3)';
+
+                    // Add a title attribute for tooltip
+                    card.setAttribute('title', 'Exact match in author name - lower relevance');
+                    break;
+
+                case 'other':
+                    // For other matches, just add a subtle indicator
+                    card.setAttribute('title', 'Contains your search query somewhere - lowest relevance');
+                    break;
+
+                default:
+                    // For unknown match types
+                    if (parseInt(relevance) === 1) {
+                        card.setAttribute('title', 'Contains your search query - lowest relevance');
+                    }
+            }
+
+            // Add a debug indicator to show where the match was found
+            const debugInfo = document.createElement('div');
+            debugInfo.className = 'absolute top-0 right-0 text-xs text-white px-2 py-1 rounded-bl-md';
+
+            // Set color based on match type
+            switch(matchType) {
+                case 'title-exact':
+                    debugInfo.style.backgroundColor = '#ec4899';
+                    debugInfo.textContent = 'Exact Title Match';
+                    break;
+                case 'title':
+                    debugInfo.style.backgroundColor = '#8b5cf6';
+                    debugInfo.textContent = 'Title Match';
+                    break;
+                case 'keyword':
+                    debugInfo.style.backgroundColor = '#3b82f6';
+                    debugInfo.textContent = 'Keyword Match';
+                    break;
+                case 'abstract':
+                    debugInfo.style.backgroundColor = '#6366f1';
+                    debugInfo.textContent = 'Abstract Match';
+                    break;
+                case 'author':
+                    debugInfo.style.backgroundColor = '#10b981';
+                    debugInfo.textContent = 'Author Match';
+                    break;
+                default:
+                    debugInfo.style.backgroundColor = '#9ca3af';
+                    debugInfo.textContent = 'Other Match';
+            }
+
+            // Only add the debug info if we're searching
+            if (document.getElementById('search-input').value.trim()) {
+                card.style.position = 'relative'; // Ensure positioning works
+                card.appendChild(debugInfo);
+            }
+        });
+    }
+
+    // Real-time search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        initCarousel();
+
+        const searchInput = document.getElementById('search-input');
+        const searchForm = document.getElementById('search-form');
+        const searchLoading = document.getElementById('search-loading');
+        const searchStatus = document.getElementById('search-status');
+        const searchQueryDisplay = document.getElementById('search-query-display');
+        const resultsContainer = document.querySelector('.space-y-6');
+        const originalContent = resultsContainer.innerHTML;
+        let searchTimeout;
+
+        // Function to perform real-time search
+        function performSearch() {
+            const query = searchInput.value.trim();
+
+            // If query is empty, restore original content and hide status
+            if (query === '') {
+                resultsContainer.innerHTML = originalContent;
+                searchStatus.classList.add('hidden');
+                return;
+            }
+
+            // Show loading indicator and update search status
+            searchLoading.classList.remove('hidden');
+            searchStatus.classList.remove('hidden');
+            searchQueryDisplay.textContent = `"${query}"`;
+
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+
+            // Set a timeout to prevent too many requests
+            searchTimeout = setTimeout(() => {
+                // Create URL with search parameters
+                const url = new URL(window.location.href);
+                url.searchParams.set('q', query);
+
+                // Fetch search results
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        // Create a temporary element to parse the HTML
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = html;
+
+                        // Extract the results container from the response
+                        const newResults = tempDiv.querySelector('.space-y-6');
+
+                        if (newResults) {
+                            // Update the results container with the new content
+                            resultsContainer.innerHTML = newResults.innerHTML;
+
+                            // Check if there are any papers in the results
+                            const papers = resultsContainer.querySelectorAll('.paper-card');
+
+                            // Get the count of results
+                            let resultCount = 0;
+                            const countElement = resultsContainer.querySelector('.font-medium.text-emerald-700');
+                            if (countElement) {
+                                const countText = countElement.textContent;
+                                const match = countText.match(/\d+/);
+                                if (match) {
+                                    resultCount = parseInt(match[0]);
+                                }
+                            }
+
+                            // Sort papers by exact title match first, then by relevance
+                            // This ensures exact title matches always appear at the top regardless of backend sorting
+                            const paperCardsArray = Array.from(papers);
+                            paperCardsArray.sort((a, b) => {
+                                const aMatchType = a.getAttribute('data-match-type');
+                                const bMatchType = b.getAttribute('data-match-type');
+                                const aRelevance = parseInt(a.getAttribute('data-relevance') || '0');
+                                const bRelevance = parseInt(b.getAttribute('data-relevance') || '0');
+
+                                // First prioritize exact title matches
+                                if (aMatchType === 'title-exact' && bMatchType !== 'title-exact') {
+                                    return -1;
+                                }
+                                if (bMatchType === 'title-exact' && aMatchType !== 'title-exact') {
+                                    return 1;
+                                }
+
+                                // Then prioritize by relevance score
+                                return bRelevance - aRelevance;
+                            });
+
+                            // Reorder the cards in the DOM
+                            if (paperCardsArray.length > 0) {
+                                const parent = papers[0].parentNode;
+                                paperCardsArray.forEach(card => {
+                                    parent.appendChild(card);
+                                });
+                            }
+
+                            if (papers.length === 0) {
+                                // Show no results message if needed
+                                const noResultsDiv = document.createElement('div');
+                                noResultsDiv.className = 'bg-white rounded-lg p-6 text-center shadow-sm';
+                                noResultsDiv.innerHTML = `
+                                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12a4 4 0 00-4-4h-.01M12 12a4 4 0 01-4 4h-.01"/>
+                                    </svg>
+                                    <h3 class="mt-4 text-lg font-medium text-gray-900">No matching projects found</h3>
+                                    <p class="mt-2 text-gray-500">Try different search terms or clear your search</p>
+                                    <div class="mt-4 flex flex-col sm:flex-row gap-2 justify-center">
+                                        <button type="button" onclick="document.getElementById('search-input').value = ''; document.getElementById('search-input').dispatchEvent(new Event('input'));"
+                                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200">
+                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                            Clear search
+                                        </button>
+                                        <button type="button" onclick="suggestSearch();"
+                                                class="inline-flex items-center px-4 py-2 border border-emerald-600 text-sm font-medium rounded-md text-emerald-600 bg-white hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200">
+                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                            </svg>
+                                            Try suggestions
+                                        </button>
+                                    </div>
+                                `;
+                                resultsContainer.appendChild(noResultsDiv);
+                            } else if (resultCount > 0) {
+                                // Add a helpful message when we have results
+                                const resultsInfo = document.createElement('div');
+                                resultsInfo.className = 'mt-4 text-sm text-center text-gray-600';
+                                resultsInfo.innerHTML = `
+                                    <p>Found ${resultCount} result${resultCount !== 1 ? 's' : ''} for "${query}"</p>
+                                    <p class="mt-1">You can refine your search by adding more specific terms</p>
+                                `;
+
+                                // Add after the last paper card
+                                if (papers.length > 0) {
+                                    papers[papers.length - 1].after(resultsInfo);
+                                }
+                            }
+
+                            // Make sure search status is visible and updated
+                            searchStatus.classList.remove('hidden');
+                            searchQueryDisplay.textContent = `"${query}"`;
+
+                            // Highlight search terms in abstracts
+                            highlightSearchTerms(query);
+
+                            // Add visual indicators for relevance
+                            updateRelevanceIndicators();
+                        }
+
+                        // Hide loading indicator
+                        searchLoading.classList.add('hidden');
+                    })
+                    .catch(error => {
+                        console.error('Error performing search:', error);
+                        searchLoading.classList.add('hidden');
+                    });
+            }, 250); // Reduced to 250ms for faster response
+        }
+
+        // Add event listeners for input changes and keyup events
+        searchInput.addEventListener('input', performSearch);
+        searchInput.addEventListener('keyup', function(event) {
+            // Trigger search on keyup for immediate feedback
+            performSearch();
+        });
+
+        // Prevent form submission if using real-time search
+        searchForm.addEventListener('submit', function(event) {
+            // Allow form submission for empty queries to reset the search
+            if (searchInput.value.trim() !== '') {
+                event.preventDefault();
+                performSearch();
+            }
+        });
+    });
+
+    // Citation Modal Functions
+    function showCitationModal(paperId, title, authors, year) {
+        // Create the citation in APA format
+        const apaCitation = formatAPACitation(authors, year, title);
+
+        // Create modal if it doesn't exist
+        if (!document.getElementById('citation-modal')) {
+            const modal = document.createElement('div');
+            modal.id = 'citation-modal';
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-900">Citation</h3>
+                        <button onclick="closeCitationModal()" class="text-gray-500 hover:text-gray-700">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">APA Format</h4>
+                        <div id="apa-citation" class="bg-gray-50 p-3 rounded-md text-sm text-gray-800 border border-gray-200"></div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="copyToClipboard()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                            </svg>
+                            Copy to Clipboard
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Update citation content
+        document.getElementById('apa-citation').textContent = apaCitation;
+
+        // Show modal
+        document.getElementById('citation-modal').classList.remove('hidden');
+    }
+
+    function closeCitationModal() {
+        document.getElementById('citation-modal').classList.add('hidden');
+    }
+
+    function copyToClipboard() {
+        const citation = document.getElementById('apa-citation').textContent;
+        navigator.clipboard.writeText(citation).then(() => {
+            // Show success message
+            const button = document.querySelector('#citation-modal button:last-child');
+            const originalText = button.innerHTML;
+            button.innerHTML = `
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Copied!
+            `;
+            button.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+            button.classList.add('bg-green-600', 'hover:bg-green-700');
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                button.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+            }, 2000);
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+            alert('Failed to copy to clipboard. Please try again.');
+        });
+    }
+
+    function formatAPACitation(authors, year, title) {
+        // Format authors for APA style
+        let formattedAuthors = '';
+        const authorList = authors.split(', ');
+
+        if (authorList.length === 1) {
+            // Single author: Last, F. I.
+            const nameParts = authorList[0].trim().split(' ');
+            const lastName = nameParts.pop();
+            const initials = nameParts.map(name => name.charAt(0) + '.').join(' ');
+            formattedAuthors = `${lastName}, ${initials}`;
+        } else if (authorList.length === 2) {
+            // Two authors: Last, F. I., & Last, F. I.
+            const author1Parts = authorList[0].trim().split(' ');
+            const author1Last = author1Parts.pop();
+            const author1Initials = author1Parts.map(name => name.charAt(0) + '.').join(' ');
+
+            const author2Parts = authorList[1].trim().split(' ');
+            const author2Last = author2Parts.pop();
+            const author2Initials = author2Parts.map(name => name.charAt(0) + '.').join(' ');
+
+            formattedAuthors = `${author1Last}, ${author1Initials}, & ${author2Last}, ${author2Initials}`;
+        } else if (authorList.length <= 7) {
+            // 3-7 authors: Last, F. I., Last, F. I., Last, F. I., & Last, F. I.
+            const formattedAuthorList = authorList.map((author, index) => {
+                const nameParts = author.trim().split(' ');
+                const lastName = nameParts.pop();
+                const initials = nameParts.map(name => name.charAt(0) + '.').join(' ');
+                return `${lastName}, ${initials}`;
+            });
+
+            // Join all but the last author with commas
+            const lastAuthor = formattedAuthorList.pop();
+            formattedAuthors = formattedAuthorList.join(', ') + ', & ' + lastAuthor;
+        } else {
+            // More than 7 authors: First 6 authors, ..., Last author
+            const formattedAuthorList = authorList.slice(0, 6).map(author => {
+                const nameParts = author.trim().split(' ');
+                const lastName = nameParts.pop();
+                const initials = nameParts.map(name => name.charAt(0) + '.').join(' ');
+                return `${lastName}, ${initials}`;
+            });
+
+            const lastAuthorParts = authorList[authorList.length - 1].trim().split(' ');
+            const lastAuthorLast = lastAuthorParts.pop();
+            const lastAuthorInitials = lastAuthorParts.map(name => name.charAt(0) + '.').join(' ');
+
+            formattedAuthors = formattedAuthorList.join(', ') + ', ... ' + `${lastAuthorLast}, ${lastAuthorInitials}`;
+        }
+
+        // Format title (only first word and proper nouns capitalized)
+        const formattedTitle = title.charAt(0).toUpperCase() + title.slice(1).toLowerCase();
+
+        // Return the complete APA citation
+        return `${formattedAuthors} (${year}). ${formattedTitle}. J.H. Computer Science Club Digital Repository.`;
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('citation-modal');
+        if (modal && !modal.classList.contains('hidden')) {
+            const modalContent = modal.querySelector('div');
+            if (event.target === modal) {
+                closeCitationModal();
+            }
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('citation-modal');
+            if (modal && !modal.classList.contains('hidden')) {
+                closeCitationModal();
+            }
         }
     });
 </script>

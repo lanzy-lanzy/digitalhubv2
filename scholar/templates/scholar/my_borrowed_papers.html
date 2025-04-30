@@ -3,88 +3,169 @@
 {% block title %}My Borrowed Papers{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">My Borrowed Papers</h1>
+<div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4 sm:mb-6">My Borrowed Papers</h1>
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Paper
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Borrow Date
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Return Date
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for borrow in borrows %}
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">{{ borrow.paper.title|upper }}</div>
-                        <div class="text-xs text-gray-500">Requested: {{ borrow.request_date|date:"M d, Y h:i A" }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ borrow.borrow_date|date:"M d, Y" }}</div>
+    <!-- Mobile Card View (visible on small screens) -->
+    <div class="sm:hidden space-y-4">
+        {% for borrow in borrows %}
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <div class="p-4 border-b border-gray-100">
+                <h2 class="text-base font-semibold text-gray-900 mb-1">{{ borrow.paper.title|upper }}</h2>
+                <div class="text-xs text-gray-500">Requested: {{ borrow.request_date|date:"M d, Y" }}</div>
+
+                <div class="flex items-center mt-2">
+                    {% if borrow.is_returned %}
+                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-green-100 text-green-800">
+                        Returned
+                    </span>
+                    {% elif borrow.status == 'pending' %}
+                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                        Pending
+                    </span>
+                    {% elif borrow.status == 'approved' %}
+                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        Approved
+                    </span>
+                    {% elif borrow.status == 'rejected' %}
+                    <span class="px-2 py-1 inline-flex text-xs leading-4 font-semibold rounded-full bg-red-100 text-red-800">
+                        Rejected
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="px-4 py-3 bg-gray-50">
+                <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                    <div>
+                        <div class="text-gray-600 font-medium">Borrow Date:</div>
+                        <div>{{ borrow.borrow_date|date:"M d, Y"|default:"-" }}</div>
                         {% if borrow.borrow_reason %}
-                        <div class="text-xs text-gray-500 mt-1">Reason: {{ borrow.borrow_reason|truncatechars:30 }}</div>
+                        <div class="text-gray-500 mt-1 truncate">Reason: {{ borrow.borrow_reason|truncatechars:20 }}</div>
                         {% endif %}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">{{ borrow.return_date|date:"M d, Y"|default:"-" }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-600 font-medium">Return Date:</div>
+                        <div>{{ borrow.return_date|date:"M d, Y"|default:"-" }}</div>
                         {% if borrow.due_date and not borrow.is_returned %}
-                        <div class="text-xs text-gray-500 mt-1">Due: {{ borrow.due_date|date:"M d, Y" }}</div>
+                        <div class="text-gray-500 mt-1">Due: {{ borrow.due_date|date:"M d, Y" }}</div>
                         {% endif %}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        {% if borrow.is_returned %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            Returned
-                        </span>
-                        {% elif borrow.status == 'pending' %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                            Pending
-                        </span>
-                        {% elif borrow.status == 'approved' %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                            Approved
-                        </span>
-                        {% elif borrow.status == 'rejected' %}
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                            Rejected
-                        </span>
-                        {% endif %}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        {% if borrow.status == 'approved' and not borrow.is_returned %}
-                            {% if borrow.return_status == 'pending' %}
-                                <button class="px-4 py-2 bg-gray-500 text-white rounded cursor-not-allowed" disabled>
-                                    Return Requested
-                                </button>
-                            {% else %}
-                                <form action="{% url 'request_return' borrow.id %}" method="post" class="return-form">
-                                    {% csrf_token %}
-                                    <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 return-button">
-                                        Return
-                                    </button>
-                                </form>
+                    </div>
+                </div>
+
+                {% if borrow.status == 'approved' and not borrow.is_returned %}
+                <div class="mt-2">
+                    {% if borrow.return_status == 'pending' %}
+                        <button class="w-full px-3 py-1.5 bg-gray-500 text-white text-xs rounded cursor-not-allowed" disabled>
+                            Return Requested
+                        </button>
+                    {% else %}
+                        <form action="{% url 'request_return' borrow.id %}" method="post" class="return-form">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full px-3 py-1.5 bg-red-500 text-white text-xs rounded hover:bg-red-600 return-button">
+                                Request Return
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="bg-white shadow rounded-lg p-6 text-center">
+            <p class="text-sm text-gray-500">No borrowed papers found.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Desktop Table View (hidden on small screens) -->
+    <div class="hidden sm:block bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Paper
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Borrow Date
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Return Date
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for borrow in borrows %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ borrow.paper.title|upper }}</div>
+                            <div class="text-xs text-gray-500">Requested: {{ borrow.request_date|date:"M d, Y h:i A" }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ borrow.borrow_date|date:"M d, Y" }}</div>
+                            {% if borrow.borrow_reason %}
+                            <div class="text-xs text-gray-500 mt-1">Reason: {{ borrow.borrow_reason|truncatechars:30 }}</div>
                             {% endif %}
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ borrow.return_date|date:"M d, Y"|default:"-" }}</div>
+                            {% if borrow.due_date and not borrow.is_returned %}
+                            <div class="text-xs text-gray-500 mt-1">Due: {{ borrow.due_date|date:"M d, Y" }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if borrow.is_returned %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Returned
+                            </span>
+                            {% elif borrow.status == 'pending' %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                Pending
+                            </span>
+                            {% elif borrow.status == 'approved' %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                Approved
+                            </span>
+                            {% elif borrow.status == 'rejected' %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                Rejected
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if borrow.status == 'approved' and not borrow.is_returned %}
+                                {% if borrow.return_status == 'pending' %}
+                                    <button class="px-4 py-2 bg-gray-500 text-white rounded cursor-not-allowed" disabled>
+                                        Return Requested
+                                    </button>
+                                {% else %}
+                                    <form action="{% url 'request_return' borrow.id %}" method="post" class="return-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 return-button">
+                                            Return
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No borrowed papers found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 

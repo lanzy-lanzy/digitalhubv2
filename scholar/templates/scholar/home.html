@@ -135,22 +135,22 @@
 
 
 <!-- Sticky Search Section -->
-<div class="sticky top-20 z-40 mb-4 pt-2 bg-gradient-to-b from-white to-transparent">
-    <div class="search-container p-2 md:p-3 max-w-2xl mx-auto shadow-lg">
-        <form method="get" action="{% url 'home' %}" class="flex flex-col md:flex-row gap-3">
+<div class="sticky top-16 sm:top-20 z-40 mb-3 sm:mb-4 pt-2 bg-gradient-to-b from-white to-transparent">
+    <div class="search-container p-2 sm:p-3 max-w-2xl mx-auto shadow-lg">
+        <form method="get" action="{% url 'home' %}" class="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <div class="flex-1 relative">
                 <input type="text" name="q" value="{{ query }}"
-                       class="search-input w-full pl-10 pr-4 py-3 md:py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                       placeholder="Search projects, members, technologies, and more..." />
-                <svg class="absolute left-3 top-3.5 h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="search-input w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                       placeholder="Search projects, technologies..." />
+                <svg class="absolute left-2.5 sm:left-3 top-2.5 sm:top-3.5 h-4 w-4 sm:h-5 sm:w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
             </div>
             <button type="submit"
-                    class="search-button px-6 py-3 md:py-4 rounded-lg hover:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                    class="search-button px-4 sm:px-6 py-2.5 sm:py-3 md:py-4 text-sm sm:text-base rounded-lg hover:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
                 <span class="flex items-center justify-center">
                     <span>Search</span>
-                    <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="ml-1.5 sm:ml-2 h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>
                 </span>
@@ -160,12 +160,29 @@
 </div>
 
 
-<div class="max-w-7xl mx-auto">
-    <div class="flex flex-col md:flex-row gap-6">
-        <!-- Left Sidebar - Filters -->
-        <div class="w-full md:w-64 filter-section p-5 mb-6 md:mb-0">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+<div class="max-w-7xl mx-auto px-2 sm:px-0">
+    <!-- Mobile Filter Toggle -->
+    <div class="md:hidden mb-4">
+        <button type="button"
+                onclick="document.getElementById('mobile-filters').classList.toggle('hidden')"
+                class="w-full flex items-center justify-between px-4 py-3 bg-white rounded-lg shadow-sm text-emerald-700 font-medium">
+            <div class="flex items-center">
                 <svg class="h-5 w-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                Filters & Sorting
+            </div>
+            <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4 sm:gap-6">
+        <!-- Left Sidebar - Filters (hidden on mobile by default) -->
+        <div id="mobile-filters" class="hidden md:block w-full md:w-64 filter-section p-4 sm:p-5 mb-4 md:mb-0">
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
+                <svg class="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                 </svg>
                 Refine Results
@@ -318,19 +335,19 @@
                 {% for paper in papers %}
                     <div class="paper-card bg-white rounded-lg shadow-sm overflow-hidden">
                         <!-- Paper Header -->
-                        <div class="p-6">
-                            <div class="flex items-start justify-between">
+                        <div class="p-4 sm:p-6">
+                            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between">
                                 <div class="flex-1">
-                                    <div class="flex items-center mb-2">
+                                    <div class="flex flex-wrap items-center gap-2 mb-2">
                                         {% if paper.available_copies > 0 %}
-                                            <span class="badge badge-available mr-2">
+                                            <span class="badge badge-available">
                                                 <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                 </svg>
                                                 Available
                                             </span>
                                         {% else %}
-                                            <span class="badge badge-unavailable mr-2">
+                                            <span class="badge badge-unavailable">
                                                 <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                                 </svg>
@@ -341,7 +358,7 @@
                                     </div>
 
                                     <div class="mb-2">
-                                        <h2 class="text-xl font-semibold text-gray-900 leading-tight">
+                                        <h2 class="text-lg sm:text-xl font-semibold text-gray-900 leading-tight">
                                             {% if user.is_authenticated %}
                                                 <a href="{% url 'paper_detail' paper.id %}" class="hover:text-emerald-600 transition-colors">
                                                     {{ paper.title|upper }}
@@ -350,17 +367,17 @@
                                                 {{ paper.title|upper }}
                                             {% endif %}
                                         </h2>
-                                        <div class="mt-1.5 flex flex-wrap gap-2">
-                                            <span class="text-sm font-medium px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-md whitespace-nowrap shadow-sm border border-emerald-200 inline-flex items-center">
-                                                <svg class="inline-block h-3.5 w-3.5 mr-1 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="mt-1.5 flex flex-wrap gap-1.5 sm:gap-2">
+                                            <span class="text-xs sm:text-sm font-medium px-2 py-0.5 sm:px-2.5 sm:py-1 bg-emerald-100 text-emerald-800 rounded-md whitespace-nowrap shadow-sm border border-emerald-200 inline-flex items-center">
+                                                <svg class="inline-block h-3 w-3 sm:h-3.5 sm:w-3.5 mr-0.5 sm:mr-1 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
                                                 {{ paper.publication_date|date:"Y" }}
                                             </span>
 
                                             {% for keyword in paper.get_keywords_list %}
-                                                <span class="text-sm font-medium px-2.5 py-1 bg-blue-50 text-blue-700 rounded-md whitespace-nowrap shadow-sm border border-blue-200 inline-flex items-center">
-                                                    <svg class="inline-block h-3.5 w-3.5 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <span class="text-xs sm:text-sm font-medium px-2 py-0.5 sm:px-2.5 sm:py-1 bg-blue-50 text-blue-700 rounded-md whitespace-nowrap shadow-sm border border-blue-200 inline-flex items-center">
+                                                    <svg class="inline-block h-3 w-3 sm:h-3.5 sm:w-3.5 mr-0.5 sm:mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                                     </svg>
                                                     {{ keyword|upper }}
@@ -369,7 +386,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="flex flex-wrap items-center text-sm text-gray-600 gap-2 mb-4">
+                                    <div class="flex flex-wrap items-center text-xs sm:text-sm text-gray-600 gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                                         <div class="font-medium">
                                             {% with authors=paper.authors.all %}
                                                 {% with total_authors=authors|length %}
@@ -387,9 +404,9 @@
                                             {% endwith %}
                                         </div>
 
-                                        <div class="flex items-center space-x-4 mt-1">
+                                        <div class="flex flex-wrap items-center gap-2 sm:gap-4 mt-1">
                                             <span class="flex items-center text-gray-500">
-                                                <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                                 </svg>
                                                 {% for code, name in program_choices %}
@@ -398,7 +415,7 @@
                                             </span>
 
                                             <span class="flex items-center text-gray-500">
-                                                <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                                                 </svg>
@@ -407,7 +424,7 @@
 
                                             {% if paper.citations > 0 %}
                                                 <span class="flex items-center text-gray-500">
-                                                    <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                                                     </svg>
                                                     {{ paper.citations }} likes
@@ -417,54 +434,58 @@
                                     </div>
 
                                     <!-- Abstract -->
-                                    <div class="mb-6">
-                                        <p class="text-gray-700 text-sm leading-relaxed no-copy line-clamp-3 text-justify">{{ paper.abstract }}</p>
+                                    <div class="mb-4 sm:mb-6">
+                                        <p class="text-gray-700 text-xs sm:text-sm leading-relaxed no-copy line-clamp-2 sm:line-clamp-3 text-justify">{{ paper.abstract }}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Paper Actions -->
-                            <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
-                                <div class="flex flex-wrap items-center gap-2">
+                            <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-100">
+                                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                                     {% if user.is_authenticated %}
                                         {% if paper.id in user_borrowed_papers %}
-                                            <span class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 cursor-not-allowed">
-                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <span class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-gray-500 cursor-not-allowed">
+                                                <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                 </svg>
-                                                Already Borrowed
+                                                <span class="hidden xs:inline">Already Borrowed</span>
+                                                <span class="xs:hidden">Borrowed</span>
                                             </span>
                                         {% elif paper.available_copies <= 0 %}
-                                            <span class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-gray-500 cursor-not-allowed">
-                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <span class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-gray-500 cursor-not-allowed">
+                                                <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                                 </svg>
-                                                Unavailable for Borrowing
+                                                <span class="hidden xs:inline">Unavailable</span>
                                             </span>
                                         {% else %}
                                             <a href="{% url 'borrow_paper' paper.id %}"
-                                               class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
-                                                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                               class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                                                <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                                 </svg>
-                                                Request Borrow
+                                                <span class="hidden xs:inline">Request Borrow</span>
+                                                <span class="xs:hidden">Borrow</span>
                                             </a>
                                         {% endif %}
 
                                         <a href="{% url 'paper_detail' paper.id %}"
-                                           class="inline-flex items-center px-3 py-1.5 border border-emerald-600 text-sm font-medium rounded-md text-emerald-600 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
-                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                           class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-emerald-600 text-xs sm:text-sm font-medium rounded-md text-emerald-600 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                                            <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                             </svg>
-                                            View Project
+                                            <span class="hidden xs:inline">View Project</span>
+                                            <span class="xs:hidden">View</span>
                                         </a>
                                     {% else %}
                                         <a href="{% url 'login' %}"
-                                           class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
-                                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                           class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                                            <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                                             </svg>
-                                            Login to Continue
+                                            <span class="hidden xs:inline">Login to Continue</span>
+                                            <span class="xs:hidden">Login</span>
                                         </a>
                                     {% endif %}
                                 </div>
@@ -475,22 +496,24 @@
                                             <form action="{% url 'unbookmark_paper' paper.id %}" method="post" class="inline">
                                                 {% csrf_token %}
                                                 <button type="submit"
-                                                        class="inline-flex items-center px-3 py-1.5 border border-red-600 text-sm font-medium rounded-md text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
-                                                    <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-red-600 text-xs sm:text-sm font-medium rounded-md text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200">
+                                                    <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                         <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/>
                                                     </svg>
-                                                    Unbookmark
+                                                    <span class="hidden xs:inline">Unbookmark</span>
+                                                    <span class="xs:hidden">Remove</span>
                                                 </button>
                                             </form>
                                         {% else %}
                                             <form action="{% url 'bookmark_paper' paper.id %}" method="post" class="inline">
                                                 {% csrf_token %}
                                                 <button type="submit"
-                                                        class="inline-flex items-center px-3 py-1.5 border border-emerald-600 text-sm font-medium rounded-md text-emerald-600 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
-                                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-1.5 border border-emerald-600 text-xs sm:text-sm font-medium rounded-md text-emerald-600 hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                                                    <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
                                                     </svg>
-                                                    Bookmark
+                                                    <span class="hidden xs:inline">Bookmark</span>
+                                                    <span class="xs:hidden">Save</span>
                                                 </button>
                                             </form>
                                         {% endif %}
@@ -518,32 +541,37 @@
 
             <!-- Pagination -->
             {% if papers.paginator.num_pages > 1 %}
-            <div class="pagination">
+            <div class="pagination mt-4 sm:mt-6">
                 {% if papers.has_previous %}
-                    <a href="?page={{ papers.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="flex items-center">
-                        <svg class="h-5 w-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="?page={{ papers.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                       class="flex items-center text-xs sm:text-sm px-2 py-1.5 sm:px-3 sm:py-2">
+                        <svg class="h-4 w-4 sm:h-5 sm:w-5 mr-0.5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                         </svg>
-                        Previous
+                        <span class="hidden xs:inline">Previous</span>
+                        <span class="xs:hidden">Prev</span>
                     </a>
                 {% endif %}
 
-                <div class="hidden md:flex">
+                <div class="hidden sm:flex">
                     {% for i in papers.paginator.page_range %}
                         {% if papers.number == i %}
-                            <span class="current">{{ i }}</span>
+                            <span class="current text-xs sm:text-sm px-2 py-1.5 sm:px-3 sm:py-2">{{ i }}</span>
                         {% elif i > papers.number|add:'-3' and i < papers.number|add:'3' %}
-                            <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ i }}</a>
+                            <a href="?page={{ i }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                               class="text-xs sm:text-sm px-2 py-1.5 sm:px-3 sm:py-2">{{ i }}</a>
                         {% endif %}
                     {% endfor %}
                 </div>
 
-                <span class="md:hidden current">Page {{ papers.number }} of {{ papers.paginator.num_pages }}</span>
+                <span class="sm:hidden current text-xs px-2 py-1.5">{{ papers.number }}/{{ papers.paginator.num_pages }}</span>
 
                 {% if papers.has_next %}
-                    <a href="?page={{ papers.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}" class="flex items-center">
-                        Next
-                        <svg class="h-5 w-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="?page={{ papers.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if program %}&program={{ program }}{% endif %}{% if year_from %}&year_from={{ year_from }}{% endif %}{% if year_to %}&year_to={{ year_to }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                       class="flex items-center text-xs sm:text-sm px-2 py-1.5 sm:px-3 sm:py-2">
+                        <span class="hidden xs:inline">Next</span>
+                        <span class="xs:hidden">Next</span>
+                        <svg class="h-4 w-4 sm:h-5 sm:w-5 ml-0.5 sm:ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                         </svg>
                     </a>

@@ -3,70 +3,70 @@
 {% block title %}Sign in - Scholar{% endblock %}
 
 {% block content %}
-<div class="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+<div class="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
     <div class="max-w-md w-full">
         <div class="text-center">
-            <div class="flex justify-center mb-6">
-                <svg class="h-12 w-12 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+            <div class="flex justify-center mb-4 sm:mb-6">
+                <svg class="h-10 w-10 sm:h-12 sm:w-12 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M21 5c0-1.1-.9-2-2-2h-14c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-14zm-14 14v-14h14v14h-14zm12-3h-10v-2h10v2zm0-4h-10v-2h10v2zm0-4h-10v-2h10v2z"/>
                 </svg>
             </div>
-            <h2 class="text-2xl font-normal text-gray-900 mb-1">
+            <h2 class="text-xl sm:text-2xl font-normal text-gray-900 mb-1">
                 Sign in
             </h2>
-            <p class="text-sm text-gray-600 mb-8">
+            <p class="text-xs sm:text-sm text-gray-600 mb-6 sm:mb-8">
                 to continue to Digital Hub
             </p>
         </div>
 
-        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <form class="space-y-6" method="post">
+        <div class="bg-white py-6 sm:py-8 px-4 shadow rounded-lg sm:rounded-lg sm:px-10">
+            <form class="space-y-4 sm:space-y-6" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ next }}">
 
                 <!-- Username Field -->
                 <div>
-                    <label for="id_username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <label for="id_username" class="block text-xs sm:text-sm font-medium text-gray-700">Username</label>
                     <div class="mt-1">
                         <input id="id_username" name="username" type="text" required
-                               class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                               class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                     </div>
                 </div>
 
                 <!-- Password Field -->
                 <div>
-                    <label for="id_password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <label for="id_password" class="block text-xs sm:text-sm font-medium text-gray-700">Password</label>
                     <div class="mt-1">
                         <input id="id_password" name="password" type="password" required
-                               class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                               class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-sm">
                     </div>
                 </div>
 
                 <!-- Messages -->
                 {% if messages %}
                     {% for message in messages %}
-                        <div class="rounded-md {% if message.tags == 'error' %}bg-red-50{% elif message.tags == 'warning' %}bg-yellow-50{% else %}bg-blue-50{% endif %} p-4">
+                        <div class="rounded-md {% if message.tags == 'error' %}bg-red-50{% elif message.tags == 'warning' %}bg-yellow-50{% else %}bg-blue-50{% endif %} p-3 sm:p-4">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     {% if message.tags == 'error' %}
-                                        <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-4 w-4 sm:h-5 sm:w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     {% elif message.tags == 'warning' %}
-                                        <svg class="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-4 w-4 sm:h-5 sm:w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                         </svg>
                                     {% else %}
-                                        <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg class="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     {% endif %}
                                 </div>
-                                <div class="ml-3">
-                                    <h3 class="text-sm font-medium {% if message.tags == 'error' %}text-red-800{% elif message.tags == 'warning' %}text-yellow-800{% else %}text-blue-800{% endif %}">
+                                <div class="ml-2 sm:ml-3">
+                                    <h3 class="text-xs sm:text-sm font-medium {% if message.tags == 'error' %}text-red-800{% elif message.tags == 'warning' %}text-yellow-800{% else %}text-blue-800{% endif %}">
                                         {% if message.tags == 'error' %}Error{% elif message.tags == 'warning' %}Notice{% else %}Information{% endif %}
                                     </h3>
-                                    <div class="mt-2 text-sm {% if message.tags == 'error' %}text-red-700{% elif message.tags == 'warning' %}text-yellow-700{% else %}text-blue-700{% endif %}">
+                                    <div class="mt-1 sm:mt-2 text-xs sm:text-sm {% if message.tags == 'error' %}text-red-700{% elif message.tags == 'warning' %}text-yellow-700{% else %}text-blue-700{% endif %}">
                                         <p>{{ message }}</p>
                                     </div>
                                 </div>
@@ -77,19 +77,19 @@
 
                 <!-- Form Errors -->
                 {% if form.errors %}
-                    <div class="rounded-md bg-red-50 p-4">
+                    <div class="rounded-md bg-red-50 p-3 sm:p-4">
                         <div class="flex">
                             <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="h-4 w-4 sm:h-5 sm:w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                             </div>
-                            <div class="ml-3">
-                                <h3 class="text-sm font-medium text-red-800">
+                            <div class="ml-2 sm:ml-3">
+                                <h3 class="text-xs sm:text-sm font-medium text-red-800">
                                     Authentication failed
                                 </h3>
-                                <div class="mt-2 text-sm text-red-700">
-                                    <ul class="list-disc pl-5 space-y-1">
+                                <div class="mt-1 sm:mt-2 text-xs sm:text-sm text-red-700">
+                                    <ul class="list-disc pl-4 sm:pl-5 space-y-1">
                                         {% for error in form.non_field_errors %}
                                             <li>{{ error }}</li>
                                         {% endfor %}
@@ -103,19 +103,19 @@
                 <!-- Submit Button -->
                 <div>
                     <button type="submit"
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-xs sm:text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
                         Sign in
                     </button>
                 </div>
 
                 <!-- Forgot Password and Register Links -->
-                <div class="flex items-center justify-between">
-                    <div class="text-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mt-4 sm:mt-0">
+                    <div class="text-xs sm:text-sm">
                         <a href="#" class="font-medium text-emerald-600 hover:text-emerald-500">
                             Forgot password?
                         </a>
                     </div>
-                    <div class="text-sm">
+                    <div class="text-xs sm:text-sm">
                         <a href="{% url 'register' %}" class="font-medium text-emerald-600 hover:text-emerald-500">
                             Create account
                         </a>

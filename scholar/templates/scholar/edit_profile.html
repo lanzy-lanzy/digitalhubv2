@@ -3,97 +3,97 @@
 {% block title %}Edit Profile - Digital Hub{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6 p-4">
-    <div class="bg-white rounded-xl shadow-sm p-8">
-        <div class="flex items-center space-x-4 mb-8">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
+<div class="max-w-4xl mx-auto space-y-4 sm:space-y-6 p-3 sm:p-4">
+    <div class="bg-white rounded-lg sm:rounded-xl shadow-sm p-4 sm:p-6 md:p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-3 sm:space-y-0 mb-4 sm:mb-8">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 flex items-center justify-center text-white font-bold text-xl shadow-md mx-auto sm:mx-0">
                 {{ user.username|make_list|first|upper }}
             </div>
-            <h1 class="text-2xl font-bold text-gray-900">Edit Profile</h1>
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900 text-center sm:text-left">Edit Profile</h1>
         </div>
 
-        <form method="post" class="space-y-8">
+        <form method="post" class="space-y-6 sm:space-y-8">
             {% csrf_token %}
 
             <!-- Personal Information Section -->
-            <div class="space-y-6">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="p-2 bg-emerald-100 rounded-lg">
-                        <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="space-y-4 sm:space-y-6">
+                <div class="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-6">
+                    <div class="p-1.5 sm:p-2 bg-emerald-100 rounded-lg">
+                        <svg class="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
-                    <h2 class="text-xl font-semibold text-gray-900">Personal Information</h2>
+                    <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Personal Information</h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <!-- First Name -->
                     <div class="relative">
-                        <label for="id_first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                        <input type="text" name="first_name" id="id_first_name" 
+                        <label for="id_first_name" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input type="text" name="first_name" id="id_first_name"
                                value="{{ user.first_name }}"
-                               class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                               class="block w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
 
                     <!-- Last Name -->
                     <div class="relative">
-                        <label for="id_last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                        <input type="text" name="last_name" id="id_last_name" 
+                        <label for="id_last_name" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input type="text" name="last_name" id="id_last_name"
                                value="{{ user.last_name }}"
-                               class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                               class="block w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
 
                     <!-- Email -->
                     <div class="relative">
-                        <label for="id_email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                        <input type="email" name="email" id="id_email" 
+                        <label for="id_email" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" name="email" id="id_email"
                                value="{{ user.email }}"
-                               class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                               class="block w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
 
                     <!-- Phone -->
                     <div class="relative">
-                        <label for="id_phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                        <input type="tel" name="phone" id="id_phone" 
+                        <label for="id_phone" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                        <input type="tel" name="phone" id="id_phone"
                                value="{{ user.userprofile.phone }}"
-                               class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                               class="block w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
 
                     <!-- Address -->
-                    <div class="relative col-span-full">
-                        <label for="id_address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                    <div class="relative col-span-1 sm:col-span-2">
+                        <label for="id_address" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Address</label>
                         <textarea name="address" id="id_address" rows="3"
-                                  class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">{{ user.userprofile.address }}</textarea>
+                                  class="block w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">{{ user.userprofile.address }}</textarea>
                     </div>
                 </div>
             </div>
 
             <!-- Academic Information Section -->
-            <div class="space-y-6">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="p-2 bg-emerald-100 rounded-lg">
-                        <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="space-y-4 sm:space-y-6">
+                <div class="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-6">
+                    <div class="p-1.5 sm:p-2 bg-emerald-100 rounded-lg">
+                        <svg class="h-5 w-5 sm:h-6 sm:w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v7"/>
                         </svg>
                     </div>
-                    <h2 class="text-xl font-semibold text-gray-900">Academic Information</h2>
+                    <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Academic Information</h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <!-- Student ID (Read-only) -->
                     <div class="relative">
-                        <label for="id_student_id" class="block text-sm font-medium text-gray-700 mb-1">Student ID</label>
-                        <input type="text" id="id_student_id" 
+                        <label for="id_student_id" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Student ID</label>
+                        <input type="text" id="id_student_id"
                                value="{{ user.student.student_id }}"
-                               class="block w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50" readonly>
+                               class="block w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg border border-gray-300 bg-gray-50" readonly>
                     </div>
 
                     <!-- Year Level -->
                     <div class="relative">
-                        <label for="id_year_level" class="block text-sm font-medium text-gray-700 mb-1">Year Level</label>
+                        <label for="id_year_level" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Year Level</label>
                         <select name="year_level" id="id_year_level"
-                                class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                class="block w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             {% for year, name in user.student.YEAR_CHOICES %}
                                 <option value="{{ year }}" {% if year == user.student.year_level %}selected{% endif %}>
                                     {{ name }}
@@ -103,10 +103,10 @@
                     </div>
 
                     <!-- Program -->
-                    <div class="relative col-span-full">
-                        <label for="id_program" class="block text-sm font-medium text-gray-700 mb-1">Program</label>
+                    <div class="relative col-span-1 sm:col-span-2">
+                        <label for="id_program" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Program</label>
                         <select name="program" id="id_program"
-                                class="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                class="block w-full px-3 sm:px-4 py-2 sm:py-3 text-sm rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                             {% for code, name in user.student.PROGRAM_CHOICES %}
                                 <option value="{{ code }}" {% if code == user.student.program %}selected{% endif %}>
                                     {{ name }}
@@ -118,18 +118,18 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex space-x-4 pt-6 border-t border-gray-200">
-                <button type="submit" 
-                        class="flex-1 inline-flex justify-center items-center px-4 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
-                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0 pt-4 sm:pt-6 border-t border-gray-200">
+                <button type="submit"
+                        class="flex-1 inline-flex justify-center items-center px-4 py-2.5 sm:py-3 border border-transparent rounded-lg shadow-sm text-xs sm:text-sm font-medium text-white bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                    <svg class="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
                     Save Changes
                 </button>
 
-                <a href="{% url 'profile' %}" 
-                   class="flex-1 inline-flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
-                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{% url 'profile' %}"
+                   class="flex-1 inline-flex justify-center items-center px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg shadow-sm text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
+                    <svg class="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                     Cancel

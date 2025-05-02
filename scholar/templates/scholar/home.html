@@ -1,7 +1,7 @@
 {% extends 'scholar/base.html' %}
 {% load static %}
 
-{% block title %}J.H. CSC - Computer Science Club{% endblock %}
+{% block title %}J.H. CSC - Digital Hub{% endblock %}
 
 {% block content %}
 <style>
@@ -34,14 +34,6 @@
         transform: translateY(-3px);
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         border-left: 4px solid #10b981;
-    }
-
-    /* Special styling for exact title matches - highest priority */
-    .paper-card[data-match-type="title-exact"] {
-        border-left: 4px solid #ec4899;
-        background-color: rgba(236, 72, 153, 0.05);
-        box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.1), 0 2px 4px -1px rgba(236, 72, 153, 0.06);
-        transform: translateY(-3px);
     }
 
     /* Special styling for title matches - high priority */
@@ -343,7 +335,7 @@
                         <div class="absolute inset-0 flex items-center justify-center z-10">
                             <div class="text-center px-4 sm:px-6 md:px-8 bg-black bg-opacity-50 backdrop-blur-sm rounded-xl py-6 sm:py-8 shadow-2xl max-w-4xl mx-auto">
                                 <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-4 drop-shadow-lg text-shadow">Welcome to J.H. CSC Digital Hub</h1>
-                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Your gateway to computer science research and projects</p>
+                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Your gateway to your research and projects</p>
                                 <div class="mt-6 flex justify-center">
                                     <span class="inline-flex rounded-md shadow-lg">
                                         <a href="#search" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-all duration-200">
@@ -365,7 +357,7 @@
                         <div class="absolute inset-0 flex items-center justify-center z-10">
                             <div class="text-center px-4 sm:px-6 md:px-8 bg-black bg-opacity-50 backdrop-blur-sm rounded-xl py-6 sm:py-8 shadow-2xl max-w-4xl mx-auto">
                                 <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-4 drop-shadow-lg text-shadow">Discover Research Projects</h2>
-                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Explore innovative computer science research from our students</p>
+                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Explore innovative projects and research from our students</p>
                                 {% if user.is_authenticated %}
                                 <div class="mt-6 flex justify-center">
                                     <span class="inline-flex rounded-md shadow-lg">
@@ -389,7 +381,7 @@
                         <div class="absolute inset-0 flex items-center justify-center z-10">
                             <div class="text-center px-4 sm:px-6 md:px-8 bg-black bg-opacity-50 backdrop-blur-sm rounded-xl py-6 sm:py-8 shadow-2xl max-w-4xl mx-auto">
                                 <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-4 drop-shadow-lg text-shadow">Share Your Knowledge</h2>
-                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Contribute to our growing repository of computer science resources</p>
+                                <p class="text-white text-lg sm:text-xl opacity-90 max-w-3xl mx-auto drop-shadow-md">Contribute to our growing repository of academic resources</p>
                                 {% if user.is_authenticated %}
                                 <div class="mt-6 flex justify-center">
                                     <span class="inline-flex rounded-md shadow-lg">
@@ -616,8 +608,9 @@
                         <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/>
                         </svg>
-                        Results are prioritized by match type: <span class="font-medium">exact title matches always appear first</span>, followed by partial title matches, then keywords, abstract, authors
+                        Results are prioritized by relevance to your search query
                     </div>
+                    <!-- Match type indicators commented out as requested
                     <div class="mt-1 text-xs text-gray-500 flex flex-wrap items-center ml-5">
                         <span class="w-2 h-2 rounded-full bg-pink-500 mr-1"></span>
                         <span>Exact Title Match</span>
@@ -630,6 +623,7 @@
                         <span class="w-2 h-2 rounded-full bg-green-500 mx-2"></span>
                         <span>Authors</span>
                     </div>
+                    -->
                 </div>
 
                 {% if query or year_from or year_to or program %}
@@ -711,6 +705,8 @@
                                         <span class="text-xs text-gray-500">Created {{ paper.publication_date|date:"M d, Y" }}</span>
 
                                         {% if query %}
+                                            {# Match indicators commented out as requested but keeping the logic for sorting/prioritization #}
+                                            {% comment %}
                                             {% if paper.title_exact_match > 0 %}
                                                 <span class="badge bg-pink-100 text-pink-800 border border-pink-200">
                                                     <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -755,6 +751,7 @@
                                                     Authors
                                                 </span>
                                             {% endif %}
+                                            {% endcomment %}
                                         {% endif %}
                                     </div>
 
@@ -1270,8 +1267,8 @@
                     card.style.zIndex = '30'; // Bring to front
                     card.style.transform = 'translateY(-3px)'; // More elevation
 
-                    // Add a title attribute for tooltip
-                    card.setAttribute('title', 'Exact match in title - highest relevance');
+                    // Tooltip titles commented out as requested
+                    // card.setAttribute('title', 'Exact match in title - highest relevance');
                     break;
 
                 case 'title':
@@ -1280,8 +1277,8 @@
                     card.style.animationDelay = '0.3s';
                     card.style.zIndex = '15'; // Bring to front
 
-                    // Add a title attribute for tooltip
-                    card.setAttribute('title', 'Exact match in title - high relevance');
+                    // Tooltip titles commented out as requested
+                    // card.setAttribute('title', 'Exact match in title - high relevance');
                     break;
 
                 case 'keyword':
@@ -1290,8 +1287,8 @@
                     card.style.animationDelay = '0.5s';
                     card.style.zIndex = '10'; // Bring forward but not as much as title
 
-                    // Add a title attribute for tooltip
-                    card.setAttribute('title', 'Exact match in keywords - medium relevance');
+                    // Tooltip titles commented out as requested
+                    // card.setAttribute('title', 'Exact match in keywords - medium relevance');
                     break;
 
                 case 'abstract':
@@ -1300,30 +1297,32 @@
                     card.style.animationDelay = '0.7s';
                     card.style.zIndex = '5'; // Bring forward slightly
 
-                    // Add a title attribute for tooltip
-                    card.setAttribute('title', 'Exact match in abstract - medium relevance');
+                    // Tooltip titles commented out as requested
+                    // card.setAttribute('title', 'Exact match in abstract - medium relevance');
                     break;
 
                 case 'author':
                     // Add a subtle highlight for author matches
                     card.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.3)';
 
-                    // Add a title attribute for tooltip
-                    card.setAttribute('title', 'Exact match in author name - lower relevance');
+                    // Tooltip titles commented out as requested
+                    // card.setAttribute('title', 'Exact match in author name - lower relevance');
                     break;
 
                 case 'other':
-                    // For other matches, just add a subtle indicator
-                    card.setAttribute('title', 'Contains your search query somewhere - lowest relevance');
+                    // Tooltip titles commented out as requested
+                    // card.setAttribute('title', 'Contains your search query somewhere - lowest relevance');
                     break;
 
                 default:
-                    // For unknown match types
-                    if (parseInt(relevance) === 1) {
-                        card.setAttribute('title', 'Contains your search query - lowest relevance');
-                    }
+                    // Tooltip titles commented out as requested
+                    // if (parseInt(relevance) === 1) {
+                    //     card.setAttribute('title', 'Contains your search query - lowest relevance');
+                    // }
             }
 
+            // Debug indicator to show match type commented out as requested
+            /*
             // Add a debug indicator to show where the match was found
             const debugInfo = document.createElement('div');
             debugInfo.className = 'absolute top-0 right-0 text-xs text-white px-2 py-1 rounded-bl-md';
@@ -1360,6 +1359,7 @@
                 card.style.position = 'relative'; // Ensure positioning works
                 card.appendChild(debugInfo);
             }
+            */
         });
     }
 
